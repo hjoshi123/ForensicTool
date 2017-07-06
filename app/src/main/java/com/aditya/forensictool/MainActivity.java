@@ -131,14 +131,13 @@ public class MainActivity extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder{
 
-            private TextView sender;
-            private TextView body;
+            private TextView ThreadName;
+
 
             public ViewHolder(View itemView) {
                 super(itemView);
 
-                sender = (TextView) itemView.findViewById(R.id.sender_name);
-                body = (TextView) itemView.findViewById(R.id.body);
+                ThreadName = (TextView) itemView.findViewById(R.id.thread_title);
             }
         }
 
@@ -154,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public UsersAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-            //R.layout.list_item is the layout xml dealing with how the elements of a single item in RecyclerView should appear
-            View view = getLayoutInflater().inflate(R.layout.list_item,parent,false);
+            //R.layout.sms_thread is the layout xml dealing with how the elements of a single item in RecyclerView should appear
+            View view = getLayoutInflater().inflate(R.layout.sms_thread,parent,false);
             ViewHolder viewHolder = new ViewHolder(view);
 
             return viewHolder;
@@ -165,11 +164,9 @@ public class MainActivity extends AppCompatActivity {
         public void onBindViewHolder(UsersAdapter.ViewHolder holder, int position) {
             SMSData details = UsersAdapter.this.usersList.get(position);
 
-            TextView name = holder.sender;
+            TextView name = holder.ThreadName;
             name.setText(details.getSenderNumber());
 
-            TextView body = holder.body;
-            body.setText(details.getBody());
         }
 
         @Override

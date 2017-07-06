@@ -6,19 +6,16 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private RecyclerView recyclerView;
     private ArrayList<SMSData> sms = new ArrayList<>();
-    private UsersAdapter adapter = new UsersAdapter(this,sms);
+    private ArrayList<SMSData> threadList = new ArrayList<>();
+    private ArrayList<String> AllThreads = new ArrayList<>();
+    private UsersAdapter adapter = new UsersAdapter(this,threadList);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         ContentResolver contentResolver = getContentResolver();
         Uri uri = Uri.parse("content://sms/inbox");
         Cursor cursor = contentResolver.query(uri,null,null,null,null);
-        String[] columns = new String[] { "address", "person", "date", "body","type" };
+        String[] columns = new String[] { "address", "person", "date", "body","type", "thread_id" };
         startManagingCursor(cursor);
 
         // Read the sms data and store it in the list
@@ -60,20 +59,60 @@ public class MainActivity extends AppCompatActivity {
                 sms.setBody(cursor.getString(cursor.getColumnIndex("body")));
                 sms.setSenderNumber(cursor.getString(cursor.getColumnIndex("address")));
                 String date = cursor.getString(cursor.getColumnIndex(columns[2]));
-
+                String threadID = cursor.getString(cursor.getColumnIndex("thread_id"));
+                sms.setThreadID(threadID);
                 Long timestamp = Long.parseLong(date);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(timestamp);
 
                 Date finaldate = calendar.getTime();
                 String smsDate = finaldate.toString();
-                Log.d("MainAc", smsDate);
+                sms.setTimeStamp(smsDate);
+                Log.d("SMS", smsDate);
                 this.sms.add(sms);
 
                 cursor.moveToNext();
             }
         }
         cursor.close();
+
+        ContentResolver contentResolver1 = getContentResolver();
+        Uri uri1 = Uri.parse("content://sms/sent");
+        Cursor cursor1 = contentResolver.query(uri1,null,null,null,null);
+        if(cursor1.moveToFirst()) {
+            for(int i=0; i < cursor1.getCount(); i++) {
+                SMSData sms = new SMSData();
+                sms.setBody(cursor1.getString(cursor1.getColumnIndex("body")));
+                sms.setSenderNumber(cursor1.getString(cursor1.getColumnIndex("address")));
+                String date = cursor1.getString(cursor1.getColumnIndex(columns[2]));
+                String threadID = cursor1.getString(cursor1.getColumnIndex("thread_id"));
+                sms.setThreadID(threadID);
+                Long timestamp = Long.parseLong(date);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(timestamp);
+
+                Date finaldate = calendar.getTime();
+                String smsDate = finaldate.toString();
+                sms.setTimeStamp(smsDate);
+                Log.d("SMS", smsDate);
+                this.sms.add(sms);
+
+                cursor1.moveToNext();
+            }
+        }
+        cursor1.close();
+
+        for (SMSData smsdata: sms) {
+            if(AllThreads.contains(smsdata.getThreadID()))
+            {
+
+            }
+            else
+            {
+                threadList.add(smsdata);
+                AllThreads.add(smsdata.getThreadID());
+            }
+        }
 
         adapter.notifyDataSetChanged();
     }

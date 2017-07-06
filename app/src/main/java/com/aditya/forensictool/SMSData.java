@@ -7,6 +7,8 @@ package com.aditya.forensictool;
 public class SMSData {
     private String senderNumber;
     private String body;
+    private String timeStamp;
+    private String threadID;
 
     public String getSenderNumber() {
         return senderNumber;
@@ -22,5 +24,21 @@ public class SMSData {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getThreadID() {
+        return threadID;
+    }
+
+    public void setThreadID(String threadID) {
+        this.threadID = threadID;
     }
 }

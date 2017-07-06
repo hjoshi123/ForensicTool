@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="7"
         android:maxLines="2"
+        android:text="Message"
         android:ellipsize="end"
         android:id="@+id/body"
         android:textSize="15sp"/>

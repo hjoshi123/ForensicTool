@@ -2,6 +2,7 @@ package com.aditya.forensictool;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<SMSData> threadList = new ArrayList<>();
     private ArrayList<String> AllThreads = new ArrayList<>();
     private UsersAdapter adapter = new UsersAdapter(this,threadList);
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +47,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getSMSData();
+        adapter.notifyDataSetChanged();
+    }
+
     private void getSMSData(){
         ContentResolver contentResolver = getContentResolver();
         Uri uri = Uri.parse("content://sms/inbox");
-        Cursor cursor = contentResolver.query(uri,null,null,null,null);
+        cursor = contentResolver.query(uri,null,null,null,null);
         String[] columns = new String[] { "address", "person", "date", "body","type", "thread_id" };
         startManagingCursor(cursor);
 
@@ -74,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
                 cursor.moveToNext();
             }
         }
-        cursor.close();
 
+        /* Sent SMS
         ContentResolver contentResolver1 = getContentResolver();
         Uri uri1 = Uri.parse("content://sms/sent");
         Cursor cursor1 = contentResolver.query(uri1,null,null,null,null);
@@ -101,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         cursor1.close();
+        */
 
         for (SMSData smsdata: sms) {
             if(AllThreads.contains(smsdata.getThreadID()))
@@ -120,7 +130,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        getSMSData();
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(cursor != null){
+            cursor.close();
+        }
     }
 
     private class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
@@ -129,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         private ArrayList<SMSData> usersList;
         private android.content.Context mContext;
 
-        public class ViewHolder extends RecyclerView.ViewHolder{
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
             private TextView ThreadName;
 
@@ -138,6 +157,16 @@ public class MainActivity extends AppCompatActivity {
                 super(itemView);
 
                 ThreadName = (TextView) itemView.findViewById(R.id.thread_title);
+                itemView.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+                //StartActivity
+                int position = getAdapterPosition();
+                Intent intent = new Intent(MainActivity.this,ViewMessageActivity.class);
+                intent.putExtra("Thread_id",sms.get(position).getThreadID());
+                startActivity(intent);
             }
         }
 

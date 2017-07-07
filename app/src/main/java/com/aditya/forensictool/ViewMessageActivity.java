@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -44,7 +45,7 @@ public class ViewMessageActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.msg_recyclerview);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this,R.drawable.decoration_item));
 
         checkUserPermissions();
         adapter.notifyDataSetChanged();
@@ -74,7 +75,6 @@ public class ViewMessageActivity extends AppCompatActivity {
         ContentResolver contentResolver = getContentResolver();
         Uri uri = Uri.parse("content://sms/inbox");
         cursor = contentResolver.query(uri,null,null,null,null);
-        String[] columns = new String[] { "address", "person", "date", "body","type", "thread_id" };
         startManagingCursor(cursor);
 
         // Read the sms data and store it in the list
@@ -82,6 +82,8 @@ public class ViewMessageActivity extends AppCompatActivity {
             for(int i=0; i < cursor.getCount(); i++) {
                 SMSData sms = new SMSData();
                 String threadID = cursor.getString(cursor.getColumnIndex("thread_id"));
+                Log.d("ViewMessageAc","Hi "+ threadID);
+
                 if(this.threadId.equals(threadID)){
                     sms.setBody(cursor.getString(cursor.getColumnIndex("body")));
                     String date = cursor.getString(cursor.getColumnIndex("date"));
@@ -93,11 +95,8 @@ public class ViewMessageActivity extends AppCompatActivity {
                     DateFormat df = SimpleDateFormat.getDateInstance();
 
                     sms.setTimeStamp(df.format(finaldate));
+                    this.sms.add(sms);
                 }
-
-
-                this.sms.add(sms);
-
                 cursor.moveToNext();
             }
         }
@@ -171,6 +170,24 @@ public class ViewMessageActivity extends AppCompatActivity {
 
         //if SDK is lesser than 23 then execute some function
         getSMSData();
-
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // if permission is granted then execute the same function as above
+                    getSMSData();
+                } else {
+                    // Permission Denied
+                    Toast.makeText( this,"Media Permissions necessary" , Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
 }

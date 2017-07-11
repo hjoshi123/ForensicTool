@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,7 +32,7 @@ import java.util.Date;
  */
 public class InboxFragment extends Fragment {
 
-    private ArrayList<SMSData> sms = new ArrayList<>();
+    private ArrayList<SMSData> smsList = new ArrayList<>();
     private ArrayList<SMSData> threadList = new ArrayList<>();
     private ArrayList<String> AllThreads = new ArrayList<>();
     private Cursor cursor;
@@ -62,6 +64,7 @@ public class InboxFragment extends Fragment {
     }
 
     private void getSMSData() {
+        smsList.clear();
         ContentResolver contentResolver = getActivity().getContentResolver();
         Uri uri = Uri.parse("content://sms/inbox");
         cursor = contentResolver.query(uri, null, null, null, null);
@@ -85,13 +88,13 @@ public class InboxFragment extends Fragment {
                 String smsDate = finaldate.toString();
                 sms.setTimeStamp(smsDate);
                 Log.d("SMS", smsDate);
-                this.sms.add(sms);
+                this.smsList.add(sms);
 
                 cursor.moveToNext();
             }
         }
 
-        for(SMSData smsdata: sms) {
+        for(SMSData smsdata: smsList) {
             if(AllThreads.contains(smsdata.getThreadID()))
             {
 
@@ -141,10 +144,23 @@ public class InboxFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                //StartActivity
+                Gson gson = new Gson();
                 int position = getAdapterPosition();
+                String Thread_ID = threadList.get(position).getThreadID();
+                ArrayList<SMSData> inboxSMS = new ArrayList<>();
+                for (SMSData eachSMS : smsList)
+                {
+                    if(eachSMS.getThreadID().equals(Thread_ID))
+                        inboxSMS.add(eachSMS);
+                }
+
+                String inboxSMSsent = gson.toJson(inboxSMS);
+
+                //StartActivity
+
                 Intent intent = new Intent(getActivity(),ViewMessageActivity.class);
-                intent.putExtra("Thread_id",sms.get(position).getThreadID());
+                intent.putExtra("Messages",inboxSMSsent);
+                intent.putExtra("Title", threadList.get(position).getSenderNumber());
                 startActivity(intent);
             }
         }

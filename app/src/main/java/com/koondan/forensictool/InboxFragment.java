@@ -24,13 +24,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.koondan.forensictool.Storage.SMSContract;
+import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
 import com.koondan.forensictool.Storage.SMSHelperMethod;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,8 +65,9 @@ public class InboxFragment extends Fragment {
 
             checkUserPermissions();
         }
-
+        getSMSData();
         return view;
+
     }
 
     private void getSMSData() {
@@ -219,7 +219,7 @@ public class InboxFragment extends Fragment {
         }
 
         //if SDK is lesser than 23 then execute some function
-        getSMSData();
+        //getSMSData();
 
     }
 
@@ -229,7 +229,7 @@ public class InboxFragment extends Fragment {
             case REQUEST_CODE_ASK_PERMISSIONS:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // if permission is granted then execute the same function as above
-                    getSMSData();
+                    //getSMSData();
                 } else {
                     // Permission Denied
                     Toast.makeText(getActivity(),"Media Permissions necessary" , Toast.LENGTH_SHORT)
@@ -258,6 +258,7 @@ public class InboxFragment extends Fragment {
             Toast.makeText(getActivity(),"Data not saved\nPlease Try again",Toast.LENGTH_LONG).show();
             return;
         }
+        Toast.makeText(getActivity(),"Data Saved\nThanks",Toast.LENGTH_LONG).show();
         db.close();
     }
 

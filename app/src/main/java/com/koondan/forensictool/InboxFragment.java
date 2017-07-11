@@ -3,9 +3,12 @@ package com.koondan.forensictool;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,11 +24,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.koondan.forensictool.Storage.SMSContract;
+import com.koondan.forensictool.Storage.SMSHelperMethod;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
+import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -91,6 +96,7 @@ public class InboxFragment extends Fragment {
                 sms.setTimeStamp(smsDate);
                 Log.d("SMS", smsDate);
                 this.smsList.add(sms);
+                putSMStoDatabase(sms,getContext());
 
                 cursor.moveToNext();
             }
@@ -233,6 +239,26 @@ public class InboxFragment extends Fragment {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    private void putSMStoDatabase(SMSData sms, Context context){
+        SMSHelperMethod helper = new SMSHelperMethod(context);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(SMSEntry.COLUMN_SENDER_ADDRESS,sms.getSenderNumber());
+        values.put(SMSEntry.COLUMN_MSG_BODY,sms.getBody());
+        values.put(SMSEntry.COLUMN_MSG_THREAD,sms.getThreadID());
+        values.put(SMSEntry.COLUMN_MSG_DATE,sms.getTimeStamp());
+
+        long id = db.insert(SMSEntry.TABLE_NAME,null,values);
+
+        if(id == -1){
+            Toast.makeText(getActivity(),"Data not saved\nPlease Try again",Toast.LENGTH_LONG).show();
+            return;
+        }
+        db.close();
     }
 
 }

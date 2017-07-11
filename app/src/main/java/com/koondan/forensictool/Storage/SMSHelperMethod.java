@@ -24,6 +24,7 @@ public class SMSHelperMethod extends SQLiteOpenHelper {
         String SQL_CREATE_PETS_TABLE =  "CREATE TABLE " + SMSEntry.TABLE_NAME + " ("
                 + SMSEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + SMSEntry.COLUMN_SENDER_ADDRESS + " TEXT NOT NULL, "
+                + SMSEntry.COLUMN_MSG_THREAD + " TEXT NOT NULL, "
                 + SMSEntry.COLUMN_MSG_BODY + " TEXT NOT NULL, "
                 + SMSEntry.COLUMN_MSG_DATE + " INTEGER NOT NULL DEFAULT 0);";
 

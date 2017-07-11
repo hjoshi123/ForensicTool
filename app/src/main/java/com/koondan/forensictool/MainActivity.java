@@ -137,22 +137,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-//    private void putSMStoDatabase(SMSData sms, Context context){
-//        SMSHelperMethod helper = new SMSHelperMethod(context);
-//        SQLiteDatabase db = helper.getWritableDatabase();
 //
-//        ContentValues values = new ContentValues();
-//
-//        values.put(SMSEntry.COLUMN_SENDER_ADDRESS,sms.getSenderNumber());
-//        values.put(SMSEntry.COLUMN_MSG_BODY,sms.getBody());
-//        values.put(SMSEntry.COLUMN_MSG_DATE,sms.getTimeStamp());
-//
-//        long id = db.insert(SMSEntry.TABLE_NAME,null,values);
-//
-//        if(id == -1){
-//            Toast.makeText(this,"Data not saved\nPlease Try again",Toast.LENGTH_LONG).show();
-//            return;
-//        }
-//        db.close();
-//    }
 }

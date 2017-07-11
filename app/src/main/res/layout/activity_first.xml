@@ -48,9 +48,6 @@
             android:src="@mipmap/ic_phone_white_48dp" />
 
 
-
-
-
     </LinearLayout>
 
 </LinearLayout>

@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/date"
         android:textSize="10sp"
-
         android:text="Date"/>
 
 </LinearLayout>

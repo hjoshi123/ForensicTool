@@ -2,6 +2,7 @@ package com.koondan.forensictool;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +46,7 @@ public class InboxFragment extends Fragment {
     private RecyclerView recyclerView;
     private UsersAdapter adapter = new UsersAdapter(getActivity(),threadList);
     private View view;
+    private ProgressDialog mProgressDialog;
 
     public InboxFragment() {
         // Required empty public constructor
@@ -62,8 +65,7 @@ public class InboxFragment extends Fragment {
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
             recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext()));
-
-            checkUserPermissions();
+            mProgressDialog = new ProgressDialog(getActivity());
         }
         getSMSData();
         return view;
@@ -71,56 +73,76 @@ public class InboxFragment extends Fragment {
     }
 
     private void getSMSData() {
-        smsList.clear();
-        ContentResolver contentResolver = getActivity().getContentResolver();
-        Uri uri = Uri.parse("content://sms/inbox");
-        cursor = contentResolver.query(uri, null, null, null, null);
-        String[] columns = new String[]{"address", "person", "date", "body", "type", "thread_id"};
-        getActivity().startManagingCursor(cursor);
+        Thread insertOp = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.setMessage("Saving Data....");
+                        mProgressDialog.setIndeterminate(true);
+                        mProgressDialog.show();
+                    }
+                });
 
-        // Read the sms data and store it in the list
-        if (cursor.moveToFirst()) {
-            for (int i = 0; i < cursor.getCount(); i++) {
-                SMSData sms = new SMSData();
-                sms.setBody(cursor.getString(cursor.getColumnIndex("body")));
-                sms.setSenderNumber(cursor.getString(cursor.getColumnIndex("address")));
-                String date = cursor.getString(cursor.getColumnIndex(columns[2]));
-                String threadID = cursor.getString(cursor.getColumnIndex("thread_id"));
-                sms.setThreadID(threadID);
-                Long timestamp = Long.parseLong(date);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(timestamp);
+                smsList.clear();
+                ContentResolver contentResolver = getActivity().getContentResolver();
+                Uri uri = Uri.parse("content://sms/inbox");
+                cursor = contentResolver.query(uri, null, null, null, null);
+                String[] columns = new String[]{"address", "person", "date", "body", "type", "thread_id"};
+                getActivity().startManagingCursor(cursor);
 
-                Date finaldate = calendar.getTime();
-                String smsDate = finaldate.toString();
-                sms.setTimeStamp(smsDate);
-                Log.d("SMS", smsDate);
-                this.smsList.add(sms);
-                putSMStoDatabase(sms,getContext());
+                // Read the sms data and store it in the list
+                if (cursor.moveToFirst()) {
+                    for (int i = 0; i < cursor.getCount(); i++) {
+                        final SMSData sms = new SMSData();
+                        sms.setBody(cursor.getString(cursor.getColumnIndex("body")));
+                        sms.setSenderNumber(cursor.getString(cursor.getColumnIndex("address")));
+                        String date = cursor.getString(cursor.getColumnIndex(columns[2]));
+                        String threadID = cursor.getString(cursor.getColumnIndex("thread_id"));
+                        sms.setThreadID(threadID);
+                        Long timestamp = Long.parseLong(date);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(timestamp);
 
-                cursor.moveToNext();
+                        Date finaldate = calendar.getTime();
+                        String smsDate = finaldate.toString();
+                        sms.setTimeStamp(smsDate);
+                        Log.d("SMS", smsDate);
+                        InboxFragment.this.smsList.add(sms);
+                        putSMStoDatabase(sms,getContext());
+
+                        cursor.moveToNext();
+                    }
+                }
+
+                for(SMSData smsdata: smsList) {
+                    if(AllThreads.contains(smsdata.getThreadID()))
+                    {
+
+                    }
+                    else
+                    {
+                        threadList.add(smsdata);
+                        AllThreads.add(smsdata.getThreadID());
+                    }
+                }
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.cancel();
+                        adapter.notifyDataSetChanged();
+                    }
+                });
             }
-        }
-
-        for(SMSData smsdata: smsList) {
-            if(AllThreads.contains(smsdata.getThreadID()))
-            {
-
-            }
-            else
-            {
-                threadList.add(smsdata);
-                AllThreads.add(smsdata.getThreadID());
-            }
-        }
-
-        adapter.notifyDataSetChanged();
+        });
+        insertOp.start();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        checkUserPermissions();
         adapter.notifyDataSetChanged();
     }
 
@@ -207,40 +229,6 @@ public class InboxFragment extends Fragment {
         }
     }
 
-    private void checkUserPermissions(){
-        if ( Build.VERSION.SDK_INT >= 23){
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_SMS) !=
-                    PackageManager.PERMISSION_GRANTED  ){
-                requestPermissions(new String[]{
-                                Manifest.permission.READ_SMS},
-                        REQUEST_CODE_ASK_PERMISSIONS);
-                return ;
-            }
-        }
-
-        //if SDK is lesser than 23 then execute some function
-        //getSMSData();
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_ASK_PERMISSIONS:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // if permission is granted then execute the same function as above
-                    //getSMSData();
-                } else {
-                    // Permission Denied
-                    Toast.makeText(getActivity(),"Media Permissions necessary" , Toast.LENGTH_SHORT)
-                            .show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
     private void putSMStoDatabase(SMSData sms, Context context){
         SMSHelperMethod helper = new SMSHelperMethod(context);
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -255,10 +243,9 @@ public class InboxFragment extends Fragment {
         long id = db.insert(SMSEntry.TABLE_NAME,null,values);
 
         if(id == -1){
-            Toast.makeText(getActivity(),"Data not saved\nPlease Try again",Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),"Data not saved\nPlease Try again",Toast.LENGTH_SHORT).show();
             return;
         }
-        Toast.makeText(getActivity(),"Data Saved\nThanks",Toast.LENGTH_LONG).show();
         db.close();
     }
 

@@ -5,49 +5,78 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import me.yugy.github.reveallayout.RevealLayout;
+import com.sergiocasero.revealfab.RevealFAB;
 
-public class FirstActivity extends AppCompatActivity implements View.OnClickListener {
+
+public class FirstActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
-    private FloatingActionButton smsButton, callLogsButton;
-    private RevealLayout mRevealLayout;
-    private View mRevealView;
+    private RevealFAB smsButton, callLogsButton;
+    private Intent smsIntent;
+    private Intent phoneIntent;
+    View firstView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
 
-        smsButton = (FloatingActionButton) findViewById(R.id.sms_button);
-        callLogsButton = (FloatingActionButton) findViewById(R.id.call_logs_button);
-        mRevealLayout = (RevealLayout) findViewById(R.id.reveal_layout);
-        mRevealView = findViewById(R.id.reveal_view);
-        smsButton.setOnClickListener(this);
-        callLogsButton.setOnClickListener(this);
+        smsIntent = new Intent(FirstActivity.this, MainActivity.class);
+
+        phoneIntent = new Intent(FirstActivity.this, MainActivity.class); //Change class here after completing phone
+
+
+        smsButton = (RevealFAB) findViewById(R.id.sms_button);
+        callLogsButton = (RevealFAB) findViewById(R.id.call_logs_button);
+
+        smsButton.setIntent(smsIntent);
+        callLogsButton.setIntent(phoneIntent);
+
+        smsButton.setOnClickListener(new RevealFAB.OnClickListener() {
+            @Override
+            public void onClick(RevealFAB button, View v) {
+                checkUserPermissions(button);
+            }
+        });
+
+        callLogsButton.setOnClickListener(new RevealFAB.OnClickListener() {
+            @Override
+            public void onClick(RevealFAB button, View v) {
+                checkUserPermissions(button);
+            }
+        });
 
     }
+
 
     @Override
-    public void onClick(View v) {
-        switch(v.getId()){
-            case R.id.sms_button:
-                checkUserPermissions(smsButton);
-                break;
-            case R.id.call_logs_button:
-                Toast.makeText(this,"Milestone 3",Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                Toast.makeText(this,"Nothing Here",Toast.LENGTH_SHORT).show();
-        }
+    protected void onResume() {
+        super.onResume();
+        smsButton.onResume();
+        callLogsButton.onResume();
     }
 
-    private void checkUserPermissions(FloatingActionButton mFab){
+
+
+    //    @Override
+//    public void onClick(View v) {
+//        switch(v.getId()){
+//            case R.id.sms_button:
+//                checkUserPermissions(smsButton);
+//                break;
+//            case R.id.call_logs_button:
+//                Toast.makeText(this,"Milestone 3",Toast.LENGTH_SHORT).show();
+//                break;
+//            default:
+//                Toast.makeText(this,"Nothing Here",Toast.LENGTH_SHORT).show();
+//        }
+//    }
+
+    private void checkUserPermissions(RevealFAB revealFAB){
         if ( Build.VERSION.SDK_INT >= 23){
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) !=
                     PackageManager.PERMISSION_GRANTED  ){
@@ -59,8 +88,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         }
 
         //if SDK is lesser than 23 then execute some function
-        onClickAnimation(mFab);
-        startActivity(new Intent(FirstActivity.this,MainActivity.class));
+
+        revealFAB.startActivityWithAnimation();
 
     }
 
@@ -82,38 +111,4 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void onClickAnimation (final FloatingActionButton mFab)
-    {
-        mFab.setClickable(false); // Avoid naughty guys clicking FAB again and again...
-        int[] location = new int[2];
-        mFab.getLocationOnScreen(location);
-        location[0] += mFab.getWidth() / 2;
-        location[1] += mFab.getHeight() / 2;
-
-        final Intent intent = new Intent(FirstActivity.this, MainActivity.class);
-
-        mRevealView.setVisibility(View.VISIBLE);
-        mRevealLayout.setVisibility(View.VISIBLE);
-
-        mRevealLayout.show(location[0], location[1]); // Expand from center of FAB. Actually, it just plays reveal animation.
-        mFab.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startActivity(intent);
-                /**
-                 * Without using R.anim.hold, the screen will flash because of transition
-                 * of Activities.
-                 */
-                overridePendingTransition(0, R.anim.hold);
-            }
-        }, 600); // 600 is default duration of reveal animation in RevealLayout
-        mFab.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mFab.setClickable(true);
-                mRevealLayout.setVisibility(View.INVISIBLE);
-                //mViewToReveal.setVisibility(View.INVISIBLE);
-            }
-        }, 960);
-    }
 }

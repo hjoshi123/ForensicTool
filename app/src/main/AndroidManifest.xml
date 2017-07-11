@@ -14,14 +14,16 @@
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".ViewMessageActivity" />
+        <activity android:name=".ViewSentMessagesActivity" />
+        <activity android:name=".FirstActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ViewMessageActivity" />
-        <activity android:name=".ViewSentMessagesActivity"></activity>
     </application>
 
 </manifest>

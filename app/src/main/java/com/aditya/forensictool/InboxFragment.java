@@ -39,7 +39,7 @@ public class InboxFragment extends Fragment {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private RecyclerView recyclerView;
     private UsersAdapter adapter = new UsersAdapter(getActivity(),threadList);
-
+    private View view;
 
     public InboxFragment() {
         // Required empty public constructor
@@ -50,15 +50,17 @@ public class InboxFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_inbox, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_inbox);
+        if(view == null){
+            view = inflater.inflate(R.layout.fragment_inbox, container, false);
+            recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_inbox);
 
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext()));
+            recyclerView.setAdapter(adapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+            recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext()));
 
-        checkUserPermissions();
+            checkUserPermissions();
+        }
 
         return view;
     }

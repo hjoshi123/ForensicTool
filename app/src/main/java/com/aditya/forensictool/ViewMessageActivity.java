@@ -39,8 +39,8 @@ public class ViewMessageActivity extends AppCompatActivity {
 
         allMessagesAsString = getIntent().getStringExtra("Messages");
         title = getIntent().getStringExtra("Title");
-//        ActionBar ab = getActionBar();
-//        ab.setTitle(title);
+        getSupportActionBar().setTitle(title);
+
         Log.d("Ac","Hi" + allMessagesAsString);
         Gson gson = new Gson();
         Type type = new TypeToken<List<SMSData>>(){}.getType();

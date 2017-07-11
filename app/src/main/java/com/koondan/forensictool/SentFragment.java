@@ -59,7 +59,7 @@ public class SentFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext()));
 
         checkUserPermissions();
-
+        getSMSData();
         return view;
     }
 
@@ -211,7 +211,7 @@ public class SentFragment extends Fragment {
         }
 
         //if SDK is lesser than 23 then execute some function
-        getSMSData();
+        //getSMSData();
 
     }
 
@@ -221,7 +221,7 @@ public class SentFragment extends Fragment {
             case REQUEST_CODE_ASK_PERMISSIONS:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // if permission is granted then execute the same function as above
-                    getSMSData();
+                    //getSMSData();
                 } else {
                     // Permission Denied
                     Toast.makeText(getActivity(),"Media Permissions necessary" , Toast.LENGTH_SHORT)

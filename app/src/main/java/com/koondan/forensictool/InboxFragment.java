@@ -1,4 +1,4 @@
-package com.aditya.forensictool;
+package com.koondan.forensictool;
 
 
 import android.Manifest;
@@ -30,7 +30,7 @@ import java.util.Date;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SentFragment extends Fragment {
+public class InboxFragment extends Fragment {
 
     private ArrayList<SMSData> smsList = new ArrayList<>();
     private ArrayList<SMSData> threadList = new ArrayList<>();
@@ -39,9 +39,9 @@ public class SentFragment extends Fragment {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private RecyclerView recyclerView;
     private UsersAdapter adapter = new UsersAdapter(getActivity(),threadList);
+    private View view;
 
-
-    public SentFragment() {
+    public InboxFragment() {
         // Required empty public constructor
     }
 
@@ -50,15 +50,17 @@ public class SentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_inbox, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_inbox);
+        if(view == null){
+            view = inflater.inflate(R.layout.fragment_inbox, container, false);
+            recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_inbox);
 
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext()));
+            recyclerView.setAdapter(adapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+            recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext()));
 
-        checkUserPermissions();
+            checkUserPermissions();
+        }
 
         return view;
     }
@@ -66,7 +68,7 @@ public class SentFragment extends Fragment {
     private void getSMSData() {
         smsList.clear();
         ContentResolver contentResolver = getActivity().getContentResolver();
-        Uri uri = Uri.parse("content://sms/sent");
+        Uri uri = Uri.parse("content://sms/inbox");
         cursor = contentResolver.query(uri, null, null, null, null);
         String[] columns = new String[]{"address", "person", "date", "body", "type", "thread_id"};
         getActivity().startManagingCursor(cursor);

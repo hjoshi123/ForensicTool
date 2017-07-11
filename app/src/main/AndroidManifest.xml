@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.aditya.forensictool">
+    package="com.koondan.forensictool">
 
     <uses-permission android:name="android.permission.READ_SMS" />
 
@@ -12,12 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.koondan.forensictool.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".ViewMessageActivity" />
-        <activity android:name=".ViewSentMessagesActivity" />
-        <activity android:name=".FirstActivity">
+        <activity android:name="com.koondan.forensictool.ViewMessageActivity" />
+        <activity android:name="com.koondan.forensictool.ViewSentMessagesActivity" />
+        <activity android:name="com.koondan.forensictool.FirstActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,4 +1,4 @@
-package com.aditya.forensictool;
+package com.koondan.forensictool;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -22,7 +22,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewMessageActivity extends AppCompatActivity {
+public class ViewSentMessagesActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private ArrayList<SMSData> sms = new ArrayList<>();
@@ -81,7 +81,6 @@ public class ViewMessageActivity extends AppCompatActivity {
             cursor.close();
         }
     }
-
 
 
     private class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
@@ -172,5 +171,4 @@ public class ViewMessageActivity extends AppCompatActivity {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-
 }

@@ -1,9 +1,9 @@
-package com.aditya.forensictool.Storage;
+package com.koondan.forensictool.Storage;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.aditya.forensictool.Storage.SMSContract.SMSEntry;
+import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
 
 /**
  * Created by HemantJ on 07/07/17.

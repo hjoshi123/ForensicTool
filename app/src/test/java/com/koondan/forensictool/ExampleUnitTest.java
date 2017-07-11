@@ -1,4 +1,4 @@
-package com.aditya.forensictool;
+package com.koondan.forensictool;
 
 import org.junit.Test;
 

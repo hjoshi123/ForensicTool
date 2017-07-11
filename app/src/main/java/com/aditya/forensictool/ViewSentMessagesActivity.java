@@ -1,14 +1,12 @@
 package com.aditya.forensictool;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,31 +15,44 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.List;
 
 public class ViewSentMessagesActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private ArrayList<SMSData> sms = new ArrayList<>();
-    private UsersAdapter adapter = new UsersAdapter(this,sms);
+    private ArrayList<SMSData> allMsgList = new ArrayList<>();
+    private UsersAdapter adapter = new UsersAdapter(this,allMsgList);
     private RecyclerView recyclerView;
-    private String threadId;
+    private String allMessagesAsString, title;
     private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_sent_messages);
+        setContentView(R.layout.activity_view_message);
 
-        recyclerView = (RecyclerView) findViewById(R.id.sentmsg_recyclerview);
+        allMessagesAsString = getIntent().getStringExtra("Messages");
+        title = getIntent().getStringExtra("Title");
+//        ActionBar ab = getActionBar();
+//        ab.setTitle(title);
+        Log.d("Ac","Hi" + allMessagesAsString);
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<SMSData>>(){}.getType();
+        allMsgList = (ArrayList<SMSData>) gson.fromJson(allMessagesAsString, type);
+        //List<SMSData> msglist = gson.fromJson(allMessagesAsString, type);
 
-        threadId = getIntent().getStringExtra("Thread_id");
-        Log.d("ViewSentMsg","Hi" + threadId);
-
+        for(SMSData eachSMS : allMsgList)
+        {
+            Log.d("Ac", ""+eachSMS.getThreadID()+" "+eachSMS.getBody());
+        }
+        adapter = new UsersAdapter(this,allMsgList);
+        recyclerView = (RecyclerView) findViewById(R.id.msg_recyclerview);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this,R.drawable.decoration_item));
@@ -53,39 +64,14 @@ public class ViewSentMessagesActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        checkUserPermissions();
-        adapter.notifyDataSetChanged();
+        //getSMSData();
+
     }
 
-    private void getSMSData(){
-        ContentResolver contentResolver = getContentResolver();
-        Uri uri = Uri.parse("content://sms/sent");
-        cursor = contentResolver.query(uri,null,null,null,null);
-        startManagingCursor(cursor);
-
-        // Read the sms data and store it in the list
-        if(cursor.moveToFirst()) {
-            for(int i=0; i < cursor.getCount(); i++) {
-                SMSData sms = new SMSData();
-                String threadID = cursor.getString(cursor.getColumnIndex("thread_id"));
-                Log.d("ViewMessageAc","Hi "+ threadID);
-
-                if(this.threadId.equals(threadID)){
-                    sms.setBody(cursor.getString(cursor.getColumnIndex("body")));
-                    String date = cursor.getString(cursor.getColumnIndex("date"));
-                    Long timestamp = Long.parseLong(date);
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTimeInMillis(timestamp);
-
-                    Date finaldate = calendar.getTime();
-                    DateFormat df = SimpleDateFormat.getDateInstance();
-
-                    sms.setTimeStamp(df.format(finaldate));
-                    this.sms.add(sms);
-                }
-                cursor.moveToNext();
-            }
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //getSMSData();
     }
 
     @Override
@@ -95,6 +81,7 @@ public class ViewSentMessagesActivity extends AppCompatActivity {
             cursor.close();
         }
     }
+
 
     private class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
 
@@ -163,7 +150,7 @@ public class ViewSentMessagesActivity extends AppCompatActivity {
         }
 
         //if SDK is lesser than 23 then execute some function
-        getSMSData();
+        //getSMSData();
     }
 
     @Override
@@ -172,7 +159,8 @@ public class ViewSentMessagesActivity extends AppCompatActivity {
             case REQUEST_CODE_ASK_PERMISSIONS:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // if permission is granted then execute the same function as above
-                    getSMSData();
+                    //
+                    // getSMSData();
                 } else {
                     // Permission Denied
                     Toast.makeText( this,"Media Permissions necessary" , Toast.LENGTH_SHORT)

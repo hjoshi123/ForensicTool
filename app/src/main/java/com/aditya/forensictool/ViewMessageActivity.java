@@ -82,36 +82,7 @@ public class ViewMessageActivity extends AppCompatActivity {
         }
     }
 
-//    private void getSMSData(){
-//        ContentResolver contentResolver = getContentResolver();
-//        Uri uri = Uri.parse("content://sms/inbox");
-//        cursor = contentResolver.query(uri,null,null,null,null);
-//        startManagingCursor(cursor);
-//
-//        // Read the sms data and store it in the list
-//        if(cursor.moveToFirst()) {
-//            for(int i=0; i < cursor.getCount(); i++) {
-//                SMSData sms = new SMSData();
-//                String threadID = cursor.getString(cursor.getColumnIndex("thread_id"));
-//                Log.d("ViewMessageAc","Hi "+ threadID);
-//
-//                if(this.threadId.equals(threadID)){
-//                    sms.setBody(cursor.getString(cursor.getColumnIndex("body")));
-//                    String date = cursor.getString(cursor.getColumnIndex("date"));
-//                    Long timestamp = Long.parseLong(date);
-//                    Calendar calendar = Calendar.getInstance();
-//                    calendar.setTimeInMillis(timestamp);
-//
-//                    Date finaldate = calendar.getTime();
-//                    DateFormat df = SimpleDateFormat.getDateInstance();
-//
-//                    sms.setTimeStamp(df.format(finaldate));
-//                    this.sms.add(sms);
-//                }
-//                cursor.moveToNext();
-//            }
-//        }
-//    }
+
 
     private class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
 

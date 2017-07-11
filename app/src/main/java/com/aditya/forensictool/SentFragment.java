@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,13 +32,14 @@ import java.util.Date;
  */
 public class SentFragment extends Fragment {
 
-    private ArrayList<SMSData> sms = new ArrayList<>();
+    private ArrayList<SMSData> smsList = new ArrayList<>();
     private ArrayList<SMSData> threadList = new ArrayList<>();
     private ArrayList<String> AllThreads = new ArrayList<>();
-    private Cursor cursor1;
+    private Cursor cursor;
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private RecyclerView recyclerView;
     private UsersAdapter adapter = new UsersAdapter(getActivity(),threadList);
+
 
     public SentFragment() {
         // Required empty public constructor
@@ -47,9 +50,9 @@ public class SentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_sent, container, false);
+        View view = inflater.inflate(R.layout.fragment_inbox, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_sent);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_inbox);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -60,32 +63,22 @@ public class SentFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        checkUserPermissions();
-        adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        if(cursor1 != null){
-            cursor1.close();
-        }
-    }
-
     private void getSMSData() {
+        smsList.clear();
         ContentResolver contentResolver = getActivity().getContentResolver();
-        Uri uri1 = Uri.parse("content://sms/sent");
-        cursor1 = contentResolver.query(uri1,null,null,null,null);
-        if(cursor1.moveToFirst()) {
-            for(int i=0; i < cursor1.getCount(); i++) {
+        Uri uri = Uri.parse("content://sms/sent");
+        cursor = contentResolver.query(uri, null, null, null, null);
+        String[] columns = new String[]{"address", "person", "date", "body", "type", "thread_id"};
+        getActivity().startManagingCursor(cursor);
+
+        // Read the sms data and store it in the list
+        if (cursor.moveToFirst()) {
+            for (int i = 0; i < cursor.getCount(); i++) {
                 SMSData sms = new SMSData();
-                sms.setBody(cursor1.getString(cursor1.getColumnIndex("body")));
-                sms.setSenderNumber(cursor1.getString(cursor1.getColumnIndex("address")));
-                String date = cursor1.getString(cursor1.getColumnIndex("date"));
-                String threadID = cursor1.getString(cursor1.getColumnIndex("thread_id"));
+                sms.setBody(cursor.getString(cursor.getColumnIndex("body")));
+                sms.setSenderNumber(cursor.getString(cursor.getColumnIndex("address")));
+                String date = cursor.getString(cursor.getColumnIndex(columns[2]));
+                String threadID = cursor.getString(cursor.getColumnIndex("thread_id"));
                 sms.setThreadID(threadID);
                 Long timestamp = Long.parseLong(date);
                 Calendar calendar = Calendar.getInstance();
@@ -95,13 +88,13 @@ public class SentFragment extends Fragment {
                 String smsDate = finaldate.toString();
                 sms.setTimeStamp(smsDate);
                 Log.d("SMS", smsDate);
-                this.sms.add(sms);
+                this.smsList.add(sms);
 
-                cursor1.moveToNext();
+                cursor.moveToNext();
             }
         }
 
-        for(SMSData smsdata: sms) {
+        for(SMSData smsdata: smsList) {
             if(AllThreads.contains(smsdata.getThreadID()))
             {
 
@@ -114,6 +107,21 @@ public class SentFragment extends Fragment {
         }
 
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        checkUserPermissions();
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if(cursor != null){
+            cursor.close();
+        }
     }
 
     private class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
@@ -136,10 +144,23 @@ public class SentFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                //StartActivity
+                Gson gson = new Gson();
                 int position = getAdapterPosition();
-                Intent intent = new Intent(getActivity(),ViewSentMessagesActivity.class);
-                intent.putExtra("Thread_id",sms.get(position).getThreadID());
+                String Thread_ID = threadList.get(position).getThreadID();
+                ArrayList<SMSData> inboxSMS = new ArrayList<>();
+                for (SMSData eachSMS : smsList)
+                {
+                    if(eachSMS.getThreadID().equals(Thread_ID))
+                        inboxSMS.add(eachSMS);
+                }
+
+                String inboxSMSsent = gson.toJson(inboxSMS);
+
+                //StartActivity
+
+                Intent intent = new Intent(getActivity(),ViewMessageActivity.class);
+                intent.putExtra("Messages",inboxSMSsent);
+                intent.putExtra("Title", threadList.get(position).getSenderNumber());
                 startActivity(intent);
             }
         }
@@ -158,7 +179,7 @@ public class SentFragment extends Fragment {
 
             //R.layout.sms_thread is the layout xml dealing with how the elements of a single item in RecyclerView should appear
             View view = getActivity().getLayoutInflater().inflate(R.layout.sms_thread,parent,false);
-            UsersAdapter.ViewHolder viewHolder = new UsersAdapter.ViewHolder(view);
+            ViewHolder viewHolder = new ViewHolder(view);
 
             return viewHolder;
         }

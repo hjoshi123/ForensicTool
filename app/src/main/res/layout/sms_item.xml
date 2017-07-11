@@ -4,8 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:weightSum="8"
-    android:padding="8dp">
+    android:weightSum="8">
 
     <TextView
         android:layout_width="match_parent"

@@ -1,20 +1,10 @@
 package com.aditya.forensictool;
 
-import android.Manifest;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -23,22 +13,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.aditya.forensictool.Storage.SMSContract.SMSEntry;
-
-import com.aditya.forensictool.Storage.SMSHelperMethod;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -82,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
-            moveTaskToBack(true);
+            //moveTaskToBack(true);
         }
     }
 

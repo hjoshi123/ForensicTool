@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 public class FirstActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
-    private FloatingActionButton smsButton, callLogsButton;
+    private FloatingActionButton smsButton, callLogsButton, deviceButton;
     int PERMISSION_ALL = 1;
     String[] PERMISSIONS = {Manifest.permission.READ_SMS, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
@@ -25,6 +25,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
 
         smsButton = (FloatingActionButton) findViewById(R.id.sms_button);
         callLogsButton = (FloatingActionButton) findViewById(R.id.call_logs_button);
+        deviceButton = (FloatingActionButton) findViewById(R.id.device_info_button);
 
         smsButton.setOnClickListener(this);
         callLogsButton.setOnClickListener(this);

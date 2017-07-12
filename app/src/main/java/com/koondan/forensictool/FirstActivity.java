@@ -30,6 +30,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
 
         smsButton.setOnClickListener(this);
         callLogsButton.setOnClickListener(this);
+        deviceButton.setOnClickListener(this);
+        contactButton.setOnClickListener(this);
 
         if ( Build.VERSION.SDK_INT >= 23){
             if(!hasPermissions(this, PERMISSIONS)){

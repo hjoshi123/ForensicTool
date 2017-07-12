@@ -32,6 +32,9 @@ public class ContactActivity extends AppCompatActivity {
         setContentView(R.layout.activity_contact);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_contacts);
         adapter = new UsersAdapter(this, contacts);
+
+        getSupportActionBar().setTitle("Contacts");
+
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this));

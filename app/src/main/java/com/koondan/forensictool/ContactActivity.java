@@ -5,10 +5,10 @@ import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -22,15 +22,15 @@ public class ContactActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private ArrayList<ContactData> contacts = new ArrayList<>();
     private RecyclerView recyclerView;
-    private UsersAdapter adapter = new UsersAdapter(this,contacts);
+    private UsersAdapter adapter;
     private Cursor cur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
-
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_contacts);
+        adapter = new UsersAdapter(this, contacts);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
@@ -105,14 +105,15 @@ public class ContactActivity extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-            private TextView phoneNumber,userName;
+            public TextView phoneNumberTextView,userNameTextView;
 
 
             public ViewHolder(View itemView) {
                 super(itemView);
 
-                userName = (TextView) findViewById(R.id.username);
-                phoneNumber = (TextView) findViewById(R.id.phoneNumber);
+                userNameTextView = (TextView) itemView.findViewById(R.id.user_name);
+                phoneNumberTextView = (TextView) itemView.findViewById(R.id.phone_number);
+                itemView.setOnClickListener(this);
             }
 
             @Override
@@ -144,10 +145,10 @@ public class ContactActivity extends AppCompatActivity {
         public void onBindViewHolder(UsersAdapter.ViewHolder holder, int position) {
             ContactData contactData = UsersAdapter.this.usersList.get(position);
 
-            TextView number = holder.phoneNumber;
+            TextView number = holder.phoneNumberTextView;
             number.setText(contactData.phoneNumber);
 
-            TextView name = holder.userName;
+            TextView name = holder.userNameTextView;
             name.setText(contactData.userName);
 
         }

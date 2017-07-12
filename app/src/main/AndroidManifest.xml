@@ -3,7 +3,8 @@
     package="com.koondan.forensictool">
 
     <uses-permission android:name="android.permission.READ_SMS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_search_black_36dp"
@@ -12,18 +13,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.koondan.forensictool.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity android:name="com.koondan.forensictool.ViewMessageActivity" />
-        <activity android:name="com.koondan.forensictool.ViewSentMessagesActivity" />
-        <activity android:name="com.koondan.forensictool.FirstActivity">
+            android:name=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".ViewMessageActivity" />
+        <activity android:name=".ViewSentMessagesActivity" />
+        <activity android:name=".FirstActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".DeviceActivity"></activity>
     </application>
 
 </manifest>

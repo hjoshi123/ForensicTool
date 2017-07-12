@@ -32,9 +32,7 @@ public class PhoneActivity extends AppCompatActivity {
         setContentView(R.layout.activity_phone);
         getCallDetails(getApplicationContext());
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setTitle("Call Logs");
+        getSupportActionBar().setTitle("Call Logs");
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_call_log);
         recyclerView.setAdapter(adapter);

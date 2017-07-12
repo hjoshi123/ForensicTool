@@ -1,29 +1,52 @@
 package com.koondan.forensictool;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import github.nisrulz.easydeviceinfo.base.EasyDeviceMod;
+import github.nisrulz.easydeviceinfo.base.EasyDisplayMod;
+import github.nisrulz.easydeviceinfo.base.EasySimMod;
+
 public class DeviceActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private ListView listView;
     private ArrayList<String> deviceInfo = new ArrayList<>();
-    private String serial,model,id,manufacturer,type,user,sdkVersion,board,brand,host,base,release;
-
+    private String  serial,model,id,manufacturer,type,user,sdkVersion,board,brand,base,release,
+                    imsi,simSerialNumber,carrier,noOfActiveSim,country,displayRes,screenDensity,
+                    screenSize,IMEI,OSCodename,bootLoader,phoneNumber;
+    private EasySimMod easySimMod ;
+    private EasyDisplayMod easyDisplayMod;
+    private EasyDeviceMod easyDeviceMod;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
 
-        listView = (ListView) findViewById(R.id.listview);
+        getSupportActionBar().setTitle("Device Info");
 
+        listView = (ListView) findViewById(R.id.listview);
+        easySimMod = new EasySimMod(this);
+        easyDisplayMod = new EasyDisplayMod(this);
+        easyDeviceMod = new EasyDeviceMod(this);
+
+        checkUserPermissions();
+
+    }
+
+    void getDeviceInfo(){
         serial = "Serial Number\n" +Build.SERIAL;
         model = "Model Name\n" + Build.MODEL;
         id = "Device ID\n" + Build.ID;
@@ -35,6 +58,18 @@ public class DeviceActivity extends AppCompatActivity {
         board = "Board\n" + Build.BOARD;
         sdkVersion = "SDK Version\n" + Build.VERSION.SDK;
         release = "Android Release Version Number\n" + Build.VERSION.RELEASE;
+        OSCodename = "OS Name\n" + easyDeviceMod.getOSCodename();
+        imsi = "IMSI Number\n" + easySimMod.getIMSI();
+        simSerialNumber = "Sim Serial Number\n" + easySimMod.getSIMSerial();
+        carrier = "Carrier\n" + easySimMod.getCarrier();
+        noOfActiveSim = "Number of Active Sim\n" + String.valueOf(easySimMod.getNumberOfActiveSim());
+        country = "Country\n" + easySimMod.getCountry();
+        displayRes = "Display Resolution\n" + easyDisplayMod.getResolution();
+        screenDensity = "Screen Density\n" + easyDisplayMod.getDensity();
+        screenSize = "Screen Size\n" + String.valueOf(easyDisplayMod.getPhysicalSize());
+        IMEI = "IMEI\n" + easyDeviceMod.getIMEI();
+        phoneNumber = "Phone Number\n" + easyDeviceMod.getPhoneNo();
+        bootLoader = "BootLoader\n" + easyDeviceMod.getBootloader();
 
 
         deviceInfo.add(serial);
@@ -47,9 +82,55 @@ public class DeviceActivity extends AppCompatActivity {
         deviceInfo.add(base);
         deviceInfo.add(board);
         deviceInfo.add(sdkVersion);
+        deviceInfo.add(OSCodename);
         deviceInfo.add(release);
+        deviceInfo.add(imsi);
+        deviceInfo.add(simSerialNumber);
+        deviceInfo.add(carrier);
+        deviceInfo.add(country);
+        deviceInfo.add(noOfActiveSim);
+        deviceInfo.add(displayRes);
+        deviceInfo.add(screenDensity);
+        deviceInfo.add(screenSize);
+        deviceInfo.add(bootLoader);
+        deviceInfo.add(phoneNumber);
+        deviceInfo.add(IMEI);
 
         ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,deviceInfo);
         listView.setAdapter(adapter);
+    }
+
+    private void checkUserPermissions(){
+        if ( Build.VERSION.SDK_INT >= 23){
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) !=
+                    PackageManager.PERMISSION_GRANTED  ){
+                requestPermissions(new String[]{
+                                Manifest.permission.READ_PHONE_STATE},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+                return ;
+            }
+        }
+
+        //if SDK is lesser than 23 then execute some function
+        getDeviceInfo();
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // if permission is granted then execute the same function as above
+                    getDeviceInfo();
+                } else {
+                    // Permission Denied
+                    Toast.makeText( this,"Media Permissions necessary" , Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }

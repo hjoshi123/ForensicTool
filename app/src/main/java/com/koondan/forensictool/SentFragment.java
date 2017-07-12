@@ -272,7 +272,7 @@ public class SentFragment extends Fragment {
         values.put(SMSEntry.COLUMN_MSG_THREAD,sms.getThreadID());
         values.put(SMSEntry.COLUMN_MSG_DATE,sms.getTimeStamp());
 
-        long id = db.insert(SMSEntry.TABLE_NAME,null,values);
+        long id = db.insertWithOnConflict(SMSEntry.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_REPLACE);
 
         if(id == -1){
             Toast.makeText(getActivity(),"Data not saved\nPlease Try again",Toast.LENGTH_SHORT).show();

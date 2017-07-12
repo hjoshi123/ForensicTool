@@ -61,11 +61,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 startActivity(new Intent(FirstActivity.this,MainActivity.class));
 
             }
-
-
         }
         else {
-
             //if SDK is lesser than 23 then execute some function
             startActivity(new Intent(FirstActivity.this, MainActivity.class));
         }

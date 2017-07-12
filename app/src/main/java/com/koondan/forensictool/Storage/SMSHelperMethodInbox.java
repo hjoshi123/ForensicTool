@@ -15,7 +15,7 @@ import java.io.File;
 
 public class SMSHelperMethodInbox extends SQLiteOpenHelper {
 
-    private final static String DATABASE_NAME = "messages.db";
+    private final static String DATABASE_NAME = "inbox_sms.db";
     private final static String FILE_DIR = "Forensic";
     private final static int DATABASE_VERSION = 1;
 

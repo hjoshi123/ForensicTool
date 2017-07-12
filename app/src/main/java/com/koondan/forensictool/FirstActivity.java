@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 public class FirstActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
-    private FloatingActionButton smsButton, callLogsButton, contactButton, deviceButton;
+    private FloatingActionButton smsButton, callLogsButton, contactButton, deviceButton, infoButton;
     int PERMISSION_ALL = 1;
     String[] PERMISSIONS = {Manifest.permission.READ_SMS, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALL_LOG};
 
@@ -27,11 +27,13 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         callLogsButton = (FloatingActionButton) findViewById(R.id.call_logs_button);
         deviceButton = (FloatingActionButton) findViewById(R.id.device_info_button);
         contactButton = (FloatingActionButton) findViewById(R.id.contacts_button);
+        infoButton = (FloatingActionButton) findViewById(R.id.info_button);
 
         smsButton.setOnClickListener(this);
         callLogsButton.setOnClickListener(this);
         deviceButton.setOnClickListener(this);
         contactButton.setOnClickListener(this);
+        infoButton.setOnClickListener(this);
 
         if ( Build.VERSION.SDK_INT >= 23){
             if(!hasPermissions(this, PERMISSIONS)){
@@ -56,6 +58,9 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.device_info_button:
                 startActivity(new Intent(FirstActivity.this,DeviceActivity.class));
+                break;
+            case R.id.info_button:
+                startActivity(new Intent(FirstActivity.this,InfoActivity.class));
                 break;
             default:
                 Toast.makeText(this,"Nothing Here",Toast.LENGTH_SHORT).show();

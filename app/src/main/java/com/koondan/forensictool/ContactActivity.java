@@ -11,7 +11,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 public class ContactActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private ArrayList<ContactData> contacts = new ArrayList<>();
+    private ArrayList<String> numbers = new ArrayList<>();
     private RecyclerView recyclerView;
     private UsersAdapter adapter;
     private Cursor cur;
@@ -42,6 +42,8 @@ public class ContactActivity extends AppCompatActivity {
     }
 
     private void getContacts(){
+        contacts.clear();
+        numbers.clear();
         ContentResolver cr = getContentResolver();
         cur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME+" ASC");
@@ -50,8 +52,19 @@ public class ContactActivity extends AppCompatActivity {
             while(cur.moveToNext()){
                 ContactData data = new ContactData();
                 data.userName = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                data.phoneNumber = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                contacts.add(data);
+                String phone = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                phone = phone.replaceAll("\\s+","");
+                data.phoneNumber = phone;
+                if(numbers.contains(phone))
+                {
+                    //Do nothing
+                }
+                else
+                {
+                    contacts.add(data);
+                    numbers.add(phone);
+                }
+
             }
         }
         adapter.notifyDataSetChanged();

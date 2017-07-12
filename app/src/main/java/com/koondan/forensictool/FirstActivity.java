@@ -29,6 +29,13 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         smsButton.setOnClickListener(this);
         callLogsButton.setOnClickListener(this);
 
+        if ( Build.VERSION.SDK_INT >= 23){
+            if(!hasPermissions(this, PERMISSIONS)){
+                ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+            }
+
+        }
+
     }
 
     @Override
@@ -52,7 +59,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             }
             if(hasPermissions(this, PERMISSIONS)){
                 startActivity(new Intent(FirstActivity.this,MainActivity.class));
-                return;
+
             }
 
 

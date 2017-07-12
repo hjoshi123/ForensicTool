@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.koondan.forensictool.Storage.SMSHelperMethodInbox;
+import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
 import com.koondan.forensictool.Storage.SMSHelperMethodSent;
 
 import java.util.ArrayList;

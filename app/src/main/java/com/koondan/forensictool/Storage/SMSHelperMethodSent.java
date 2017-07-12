@@ -10,7 +10,7 @@ import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
 import java.io.File;
 
 /**
- * Created by HemantJ on 07/07/17.
+ * Created by Koondan on 07/07/17.
  */
 
 public class SMSHelperMethodSent extends SQLiteOpenHelper {

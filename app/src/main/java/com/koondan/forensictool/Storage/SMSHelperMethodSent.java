@@ -13,13 +13,13 @@ import java.io.File;
  * Created by HemantJ on 07/07/17.
  */
 
-public class SMSHelperMethod extends SQLiteOpenHelper {
+public class SMSHelperMethodSent extends SQLiteOpenHelper {
 
-    private final static String DATABASE_NAME = "messages.db";
+    private final static String DATABASE_NAME = "sent_sms.db";
     private final static String FILE_DIR = "Forensic";
     private final static int DATABASE_VERSION = 1;
 
-    public SMSHelperMethod(Context context){
+    public SMSHelperMethodSent(Context context){
         super(context, Environment.getExternalStorageDirectory()
                 + File.separator + FILE_DIR
                 + File.separator + DATABASE_NAME, null, DATABASE_VERSION);

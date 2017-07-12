@@ -2,10 +2,14 @@ package com.koondan.forensictool;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +25,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.koondan.forensictool.Storage.SMSHelperMethodInbox;
+import com.koondan.forensictool.Storage.SMSHelperMethodSent;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +45,7 @@ public class SentFragment extends Fragment {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private RecyclerView recyclerView;
     private UsersAdapter adapter = new UsersAdapter(getActivity(),threadList);
-
+    private ProgressDialog mProgressDialog;
 
     public SentFragment() {
         // Required empty public constructor
@@ -64,49 +70,71 @@ public class SentFragment extends Fragment {
     }
 
     private void getSMSData() {
-        smsList.clear();
-        ContentResolver contentResolver = getActivity().getContentResolver();
-        Uri uri = Uri.parse("content://sms/sent");
-        cursor = contentResolver.query(uri, null, null, null, null);
-        String[] columns = new String[]{"address", "person", "date", "body", "type", "thread_id"};
-        getActivity().startManagingCursor(cursor);
+        Thread insertOp = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.setMessage("Saving Data....");
+                        mProgressDialog.setIndeterminate(true);
+                        mProgressDialog.show();
+                    }
+                });
 
-        // Read the sms data and store it in the list
-        if (cursor.moveToFirst()) {
-            for (int i = 0; i < cursor.getCount(); i++) {
-                SMSData sms = new SMSData();
-                sms.setBody(cursor.getString(cursor.getColumnIndex("body")));
-                sms.setSenderNumber(cursor.getString(cursor.getColumnIndex("address")));
-                String date = cursor.getString(cursor.getColumnIndex(columns[2]));
-                String threadID = cursor.getString(cursor.getColumnIndex("thread_id"));
-                sms.setThreadID(threadID);
-                Long timestamp = Long.parseLong(date);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(timestamp);
+                smsList.clear();
+                ContentResolver contentResolver = getActivity().getContentResolver();
+                Uri uri = Uri.parse("content://sms/inbox");
+                cursor = contentResolver.query(uri, null, null, null, null);
+                String[] columns = new String[]{"address", "person", "date", "body", "type", "thread_id"};
+                getActivity().startManagingCursor(cursor);
 
-                Date finaldate = calendar.getTime();
-                String smsDate = finaldate.toString();
-                sms.setTimeStamp(smsDate);
-                Log.d("SMS", smsDate);
-                this.smsList.add(sms);
+                // Read the sms data and store it in the list
+                if (cursor.moveToFirst()) {
+                    for (int i = 0; i < cursor.getCount(); i++) {
+                        final SMSData sms = new SMSData();
+                        sms.setBody(cursor.getString(cursor.getColumnIndex("body")));
+                        sms.setSenderNumber(cursor.getString(cursor.getColumnIndex("address")));
+                        String date = cursor.getString(cursor.getColumnIndex(columns[2]));
+                        String threadID = cursor.getString(cursor.getColumnIndex("thread_id"));
+                        sms.setThreadID(threadID);
+                        Long timestamp = Long.parseLong(date);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(timestamp);
 
-                cursor.moveToNext();
+                        Date finaldate = calendar.getTime();
+                        String smsDate = finaldate.toString();
+                        sms.setTimeStamp(smsDate);
+                        Log.d("SMS", smsDate);
+                        SentFragment.this.smsList.add(sms);
+                        putSMStoDatabase(sms,getContext());
+
+                        cursor.moveToNext();
+                    }
+                }
+
+                for(SMSData smsdata: smsList) {
+                    if(AllThreads.contains(smsdata.getThreadID()))
+                    {
+
+                    }
+                    else
+                    {
+                        threadList.add(smsdata);
+                        AllThreads.add(smsdata.getThreadID());
+                    }
+                }
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.cancel();
+                        adapter.notifyDataSetChanged();
+                    }
+                });
             }
-        }
-
-        for(SMSData smsdata: smsList) {
-            if(AllThreads.contains(smsdata.getThreadID()))
-            {
-
-            }
-            else
-            {
-                threadList.add(smsdata);
-                AllThreads.add(smsdata.getThreadID());
-            }
-        }
-
-        adapter.notifyDataSetChanged();
+        });
+        insertOp.start();
     }
 
     @Override
@@ -232,5 +260,26 @@ public class SentFragment extends Fragment {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
+    private void putSMStoDatabase(SMSData sms, Context context){
+        SMSHelperMethodSent helper = new SMSHelperMethodSent(context);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(SMSEntry.COLUMN_SENDER_ADDRESS,sms.getSenderNumber());
+        values.put(SMSEntry.COLUMN_MSG_BODY,sms.getBody());
+        values.put(SMSEntry.COLUMN_MSG_THREAD,sms.getThreadID());
+        values.put(SMSEntry.COLUMN_MSG_DATE,sms.getTimeStamp());
+
+        long id = db.insert(SMSEntry.TABLE_NAME,null,values);
+
+        if(id == -1){
+            Toast.makeText(getActivity(),"Data not saved\nPlease Try again",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        db.close();
+    }
+
 
 }

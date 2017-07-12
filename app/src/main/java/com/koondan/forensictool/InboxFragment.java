@@ -1,19 +1,15 @@
 package com.koondan.forensictool;
 
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,13 +17,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
-import com.koondan.forensictool.Storage.SMSHelperMethod;
+import com.koondan.forensictool.Storage.SMSHelperMethodInbox;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -230,7 +225,7 @@ public class InboxFragment extends Fragment {
     }
 
     private void putSMStoDatabase(SMSData sms, Context context){
-        SMSHelperMethod helper = new SMSHelperMethod(context);
+        SMSHelperMethodInbox helper = new SMSHelperMethodInbox(context);
         SQLiteDatabase db = helper.getWritableDatabase();
 
         ContentValues values = new ContentValues();

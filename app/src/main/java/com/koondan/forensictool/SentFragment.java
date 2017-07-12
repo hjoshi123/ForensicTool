@@ -63,7 +63,7 @@ public class SentFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext()));
-
+        mProgressDialog = new ProgressDialog(getActivity());
         checkUserPermissions();
         getSMSData();
         return view;
@@ -84,7 +84,7 @@ public class SentFragment extends Fragment {
 
                 smsList.clear();
                 ContentResolver contentResolver = getActivity().getContentResolver();
-                Uri uri = Uri.parse("content://sms/inbox");
+                Uri uri = Uri.parse("content://sms/sent");
                 cursor = contentResolver.query(uri, null, null, null, null);
                 String[] columns = new String[]{"address", "person", "date", "body", "type", "thread_id"};
                 getActivity().startManagingCursor(cursor);

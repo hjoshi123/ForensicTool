@@ -32,6 +32,10 @@ public class PhoneActivity extends AppCompatActivity {
         setContentView(R.layout.activity_phone);
         getCallDetails(getApplicationContext());
 
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//        getSupportActionBar().setTitle("Call Logs");
+
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_call_log);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -72,6 +76,8 @@ public class PhoneActivity extends AppCompatActivity {
                     case CallLog.Calls.MISSED_TYPE:
                         newLog.type = "MISSED";
                         break;
+                    default:
+                        newLog.type = "MISSED";
                 }
                 Log.d("Phone", newLog.toString());
                 logsList.add(newLog);
@@ -135,13 +141,22 @@ public class PhoneActivity extends AppCompatActivity {
             phone.setText(details.getNumber());
 
             TextView duration = holder.Duration;
-            duration.setText(details.getDuration());
+            int sec = Integer.parseInt(details.getDuration());
+            int min = sec/60;
+            int s = sec%60;
+            String res;
+            if(min == 0)
+                res = ""+s+"s";
+            else
+                res = ""+min+"min "+s+"s";
+            duration.setText(res);
 
             TextView type = holder.Type;
             type.setText(details.getType());
-
+            String dateTime = details.getTimeStamp();
+            dateTime = dateTime.substring(0, dateTime.length() - 14);
             TextView time = holder.TimeStamp;
-            time.setText(details.getTimeStamp());
+            time.setText(dateTime);
 
         }
 

@@ -3,7 +3,11 @@ package com.koondan.forensictool.Storage;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+
 import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
+
+import java.io.File;
 
 /**
  * Created by HemantJ on 07/07/17.
@@ -12,11 +16,13 @@ import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
 public class SMSHelperMethod extends SQLiteOpenHelper {
 
     private final static String DATABASE_NAME = "messages.db";
-
+    private final static String FILE_DIR = "Forensic";
     private final static int DATABASE_VERSION = 1;
 
     public SMSHelperMethod(Context context){
-        super(context,DATABASE_NAME,null,DATABASE_VERSION);
+        super(context, Environment.getExternalStorageDirectory()
+                + File.separator + FILE_DIR
+                + File.separator + DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override

@@ -16,7 +16,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private FloatingActionButton smsButton, callLogsButton, contactButton, deviceButton;
     int PERMISSION_ALL = 1;
-    String[] PERMISSIONS = {Manifest.permission.READ_SMS, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    String[] PERMISSIONS = {Manifest.permission.READ_SMS, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALL_LOG};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         smsButton = (FloatingActionButton) findViewById(R.id.sms_button);
         callLogsButton = (FloatingActionButton) findViewById(R.id.call_logs_button);
         deviceButton = (FloatingActionButton) findViewById(R.id.device_info_button);
-        contactButton = (FloatingActionButton) findViewById(R.id.device_info_button);
+        contactButton = (FloatingActionButton) findViewById(R.id.contacts_button);
 
         smsButton.setOnClickListener(this);
         callLogsButton.setOnClickListener(this);
@@ -44,17 +44,23 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.sms_button:
-                checkUserPermissions();
+                checkUserPermissionsSMS();
                 break;
             case R.id.call_logs_button:
-                Toast.makeText(this,"Milestone 3",Toast.LENGTH_SHORT).show();
+                checkUserPermissionsPhone();
+                break;
+            case R.id.contacts_button:
+                checkUserPermissionsContacts();
+                break;
+            case R.id.device_info_button:
+                startActivity(new Intent(FirstActivity.this,DeviceActivity.class));
                 break;
             default:
                 Toast.makeText(this,"Nothing Here",Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void checkUserPermissions(){
+    private void checkUserPermissionsSMS(){
         if ( Build.VERSION.SDK_INT >= 23){
             if(!hasPermissions(this, PERMISSIONS)){
                 ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
@@ -67,6 +73,40 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         else {
             //if SDK is lesser than 23 then execute some function
             startActivity(new Intent(FirstActivity.this, MainActivity.class));
+        }
+
+    }
+
+    private void checkUserPermissionsPhone(){
+        if ( Build.VERSION.SDK_INT >= 23){
+            if(!hasPermissions(this, PERMISSIONS)){
+                ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+            }
+            if(hasPermissions(this, PERMISSIONS)){
+                startActivity(new Intent(FirstActivity.this,PhoneActivity.class));
+
+            }
+        }
+        else {
+            //if SDK is lesser than 23 then execute some function
+            startActivity(new Intent(FirstActivity.this, PhoneActivity.class));
+        }
+
+    }
+
+    private void checkUserPermissionsContacts(){
+        if ( Build.VERSION.SDK_INT >= 23){
+            if(!hasPermissions(this, PERMISSIONS)){
+                ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+            }
+            if(hasPermissions(this, PERMISSIONS)){
+                startActivity(new Intent(FirstActivity.this,ContactActivity.class));
+
+            }
+        }
+        else {
+            //if SDK is lesser than 23 then execute some function
+            startActivity(new Intent(FirstActivity.this, ContactActivity.class));
         }
 
     }

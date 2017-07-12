@@ -103,7 +103,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             }
             if(hasPermissions(this, PERMISSIONS)){
                 startActivity(new Intent(FirstActivity.this,ContactActivity.class));
-
             }
         }
         else {

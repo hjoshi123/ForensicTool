@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.CallLog;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +22,7 @@ import java.util.Date;
 public class PhoneActivity extends AppCompatActivity {
     private ArrayList<CallLogData> logsList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private UsersAdapter adapter = new UsersAdapter(getApplicationContext(),logsList);
+    private UsersAdapter adapter = new UsersAdapter(this,logsList);
     private View view;
     private ProgressDialog mProgressDialog;
 
@@ -31,7 +32,11 @@ public class PhoneActivity extends AppCompatActivity {
         setContentView(R.layout.activity_phone);
         getCallDetails(getApplicationContext());
 
-
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_call_log);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
+        adapter.notifyDataSetChanged();
     }
 
     private void getCallDetails(Context context) {

@@ -49,13 +49,19 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         if ( Build.VERSION.SDK_INT >= 23){
             if(!hasPermissions(this, PERMISSIONS)){
                 ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
-
-                return ;
             }
-        }
+            if(hasPermissions(this, PERMISSIONS)){
+                startActivity(new Intent(FirstActivity.this,MainActivity.class));
+                return;
+            }
 
-        //if SDK is lesser than 23 then execute some function
-        startActivity(new Intent(FirstActivity.this,MainActivity.class));
+
+        }
+        else {
+
+            //if SDK is lesser than 23 then execute some function
+            startActivity(new Intent(FirstActivity.this, MainActivity.class));
+        }
 
     }
 

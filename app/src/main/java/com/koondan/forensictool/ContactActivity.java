@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -43,7 +44,7 @@ public class ContactActivity extends AppCompatActivity {
     private void getContacts(){
         ContentResolver cr = getContentResolver();
         cur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                null, null, null, null);
+                null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME+" ASC");
 
         if(cur.getCount() > 0){
             while(cur.moveToNext()){
@@ -99,7 +100,6 @@ public class ContactActivity extends AppCompatActivity {
 
     private class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
 
-        //SongInfo is the model name class
         private ArrayList<ContactData> usersList;
         private android.content.Context mContext;
 

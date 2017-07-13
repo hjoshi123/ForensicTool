@@ -55,7 +55,6 @@ public class ViewSentMessagesActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.msg_recyclerview);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this,R.drawable.decoration_item));
 
         checkUserPermissions();
         adapter.notifyDataSetChanged();

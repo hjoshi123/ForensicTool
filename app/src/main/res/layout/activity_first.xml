@@ -41,9 +41,8 @@
                 android:layout_marginTop="-10sp"
                 android:layout_weight="1"
                 android:clickable="true"
-
                 android:src="@mipmap/ic_message_white_48dp"
-                app:backgroundTint="@android:color/holo_red_light" />
+                android:backgroundTint="@android:color/holo_red_light" />
 
             <ImageButton
                 android:id="@+id/call_logs_button"
@@ -56,7 +55,7 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:src="@mipmap/ic_phone_white_48dp"
-                app:backgroundTint="@color/fav_green" />
+                android:backgroundTint="@color/fav_green" />
 
 
         </LinearLayout>
@@ -80,7 +79,6 @@
                 android:layout_marginTop="-10sp"
                 android:layout_weight="1"
                 android:clickable="true"
-
                 android:src="@drawable/ic_person_white_48dp"
                 app:backgroundTint="@color/fav_blue" />
 

@@ -15,7 +15,6 @@
         android:textAlignment="center"
         android:textSize="20sp"
         android:textStyle="bold"
-
         android:id="@+id/thread_title"/>
 
 </LinearLayout>

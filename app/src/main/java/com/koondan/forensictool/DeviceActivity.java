@@ -28,10 +28,10 @@ public class DeviceActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private ListView listView;
     private ArrayList<String> deviceInfo = new ArrayList<>();
-    private String  serial,model,id,manufacturer,type,user,sdkVersion,board,brand,base,release,
-                    imsi,simSerialNumber,carrier,noOfActiveSim,country,displayRes,screenDensity,
-                    screenSize,IMEI,OSCodename,bootLoader,phoneNumber;
-    private EasySimMod easySimMod ;
+    private String serial, model, id, manufacturer, type, user, sdkVersion, board, brand, base, release,
+            imsi, simSerialNumber, carrier, noOfActiveSim, country, displayRes, screenDensity,
+            screenSize, IMEI, OSCodename, bootLoader, phoneNumber;
+    private EasySimMod easySimMod;
     private EasyDisplayMod easyDisplayMod;
     private EasyDeviceMod easyDeviceMod;
 
@@ -51,9 +51,9 @@ public class DeviceActivity extends AppCompatActivity {
 
     }
 
-    void getDeviceInfo(){
+    void getDeviceInfo() {
         deviceInfo.clear();
-        serial = "Serial Number\n" +Build.SERIAL;
+        serial = "Serial Number\n" + Build.SERIAL;
         model = "Model Name\n" + Build.MODEL;
         id = "Device ID\n" + Build.ID;
         manufacturer = "Manufacturer\n" + Build.MANUFACTURER;
@@ -102,38 +102,65 @@ public class DeviceActivity extends AppCompatActivity {
         deviceInfo.add(phoneNumber);
         deviceInfo.add(IMEI);
 
-        for(String info : deviceInfo)
-        {
-            writeToFile(info);
-        }
+        FileOutputStream deleteFile = null;
 
-        ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,deviceInfo);
-        listView.setAdapter(adapter);
-    }
-
-    public  void writeToFile(String body)
-    {
-        FileOutputStream fos = null;
-
+        final File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Forensic/");
         try {
-            final File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Forensic/" );
-
-            if (!dir.exists())
-            {
-                if(!dir.mkdirs()){
-                    Log.e("ALERT","could not create the directories");
+            if (!dir.exists()) {
+                if (!dir.mkdirs()) {
+                    Log.e("ALERT", "could not create the directories");
                 }
             }
 
             final File myFile = new File(dir, "device_info" + ".txt");
 
-            if (!myFile.exists())
-            {
+            if (!myFile.exists()) {
+                myFile.createNewFile();
+            }
+            //Overwriting content in previous file if any
+            String header = "Device Info\n";
+            deleteFile = new FileOutputStream(myFile);
+            deleteFile.write(header.getBytes());
+            deleteFile.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+        for (String info : deviceInfo) {
+            writeToFile(info);
+        }
+
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, deviceInfo);
+        listView.setAdapter(adapter);
+    }
+
+    public void writeToFile(String body) {
+        FileOutputStream fos = null;
+
+
+        try {
+            final File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Forensic/");
+
+            if (!dir.exists()) {
+                if (!dir.mkdirs()) {
+                    Log.e("ALERT", "could not create the directories");
+                }
+            }
+
+            final File myFile = new File(dir, "device_info" + ".txt");
+
+            if (!myFile.exists()) {
                 myFile.createNewFile();
             }
             body = body.replaceAll("\\n", " : ");
             body = body + "\n";
-            fos = new FileOutputStream(myFile);
+
+
+            //Appending content to clean file
+            Boolean append = true;
+            fos = new FileOutputStream(myFile, append);
 
             fos.write(body.getBytes());
             fos.close();
@@ -143,14 +170,14 @@ public class DeviceActivity extends AppCompatActivity {
         }
     }
 
-    private void checkUserPermissions(){
-        if ( Build.VERSION.SDK_INT >= 23){
+    private void checkUserPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) !=
-                    PackageManager.PERMISSION_GRANTED  ){
+                    PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
                                 Manifest.permission.READ_PHONE_STATE},
                         REQUEST_CODE_ASK_PERMISSIONS);
-                return ;
+                return;
             }
         }
 
@@ -168,7 +195,7 @@ public class DeviceActivity extends AppCompatActivity {
                     getDeviceInfo();
                 } else {
                     // Permission Denied
-                    Toast.makeText( this,"Media Permissions necessary" , Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "Media Permissions necessary", Toast.LENGTH_SHORT)
                             .show();
                 }
                 break;

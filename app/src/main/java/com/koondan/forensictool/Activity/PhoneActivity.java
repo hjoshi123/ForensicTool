@@ -63,6 +63,7 @@ public class PhoneActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         mProgressDialog.setMessage("Saving Data....");
+                        mProgressDialog.setCancelable(false);
                         mProgressDialog.setIndeterminate(true);
                         mProgressDialog.show();
                     }

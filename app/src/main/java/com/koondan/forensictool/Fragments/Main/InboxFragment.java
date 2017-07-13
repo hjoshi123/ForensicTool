@@ -79,6 +79,7 @@ public class InboxFragment extends Fragment {
                     @Override
                     public void run() {
                         mProgressDialog.setMessage("Saving Data....");
+                        mProgressDialog.setCancelable(false);
                         mProgressDialog.setIndeterminate(true);
                         mProgressDialog.show();
                     }

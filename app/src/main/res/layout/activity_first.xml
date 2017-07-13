@@ -118,7 +118,7 @@
                 android:layout_weight="1"
                 android:clickable="true"
 
-                android:src="@android:drawable/ic_dialog_info"
+                android:src="@drawable/ic_info_white_48dp"
                 app:backgroundTint="@color/colorAccent" />
 
 

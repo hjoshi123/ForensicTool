@@ -16,7 +16,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private ImageButton smsButton, callLogsButton, contactButton, deviceButton, infoButton;
     int PERMISSION_ALL = 1;
-    String[] PERMISSIONS = {Manifest.permission.READ_SMS, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALL_LOG};
+    String[] PERMISSIONS = {Manifest.permission.READ_SMS, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_PHONE_STATE};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -3,20 +3,25 @@ package com.koondan.forensictool;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import github.nisrulz.easydeviceinfo.base.EasyDeviceMod;
 import github.nisrulz.easydeviceinfo.base.EasyDisplayMod;
 import github.nisrulz.easydeviceinfo.base.EasySimMod;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 public class DeviceActivity extends AppCompatActivity {
 
@@ -47,6 +52,7 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     void getDeviceInfo(){
+        deviceInfo.clear();
         serial = "Serial Number\n" +Build.SERIAL;
         model = "Model Name\n" + Build.MODEL;
         id = "Device ID\n" + Build.ID;
@@ -96,8 +102,45 @@ public class DeviceActivity extends AppCompatActivity {
         deviceInfo.add(phoneNumber);
         deviceInfo.add(IMEI);
 
+        for(String info : deviceInfo)
+        {
+            writeToFile(info);
+        }
+
         ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,deviceInfo);
         listView.setAdapter(adapter);
+    }
+
+    public  void writeToFile(String body)
+    {
+        FileOutputStream fos = null;
+
+        try {
+            final File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Forensic/" );
+
+            if (!dir.exists())
+            {
+                if(!dir.mkdirs()){
+                    Log.e("ALERT","could not create the directories");
+                }
+            }
+
+            final File myFile = new File(dir, "device_info" + ".txt");
+
+            if (!myFile.exists())
+            {
+                myFile.createNewFile();
+            }
+            body = body.replaceAll("\\n", " : ");
+            body = body + "\n";
+            fos = new FileOutputStream(myFile);
+
+            fos.write(body.getBytes());
+            fos.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     private void checkUserPermissions(){

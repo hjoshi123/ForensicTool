@@ -2,9 +2,11 @@ package com.koondan.forensictool;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.support.v4.app.ActivityCompat;
@@ -15,6 +17,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.koondan.forensictool.Storage.PhoneContract;
+import com.koondan.forensictool.Storage.PhoneHelperMethod;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +28,7 @@ import java.util.Date;
 public class PhoneActivity extends AppCompatActivity {
     private ArrayList<CallLogData> logsList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private UsersAdapter adapter = new UsersAdapter(this,logsList);
+    private UsersAdapter adapter = new UsersAdapter(this, logsList);
     private View view;
     private ProgressDialog mProgressDialog;
 
@@ -31,9 +37,9 @@ public class PhoneActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone);
         getCallDetails(getApplicationContext());
-
+        logsList.clear();
         getSupportActionBar().setTitle("Call Logs");
-
+        mProgressDialog = new ProgressDialog(this);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_call_log);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -41,57 +47,82 @@ public class PhoneActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    private void getCallDetails(Context context) {
 
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
+    private void getCallDetails(final Context context) {
 
-            logsList.clear();
-            StringBuffer stringBuffer = new StringBuffer();
-            Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI,
-                    null, null, null, CallLog.Calls.DATE + " DESC");
-            int number = cursor.getColumnIndex(CallLog.Calls.NUMBER);
-            int type = cursor.getColumnIndex(CallLog.Calls.TYPE);
-            int date = cursor.getColumnIndex(CallLog.Calls.DATE);
-            int duration = cursor.getColumnIndex(CallLog.Calls.DURATION);
-            while (cursor.moveToNext()) {
-                CallLogData newLog = new CallLogData();
-                newLog.number = cursor.getString(number);
-                String callType = cursor.getString(type);
-                String callDate = cursor.getString(date);
-                Date callDayTime = new Date(Long.valueOf(callDate));
-                newLog.timeStamp = callDayTime.toString();
-                newLog.duration = cursor.getString(duration);
-                String dir = null;
-                int dircode = Integer.parseInt(callType);
-                switch (dircode) {
-                    case CallLog.Calls.OUTGOING_TYPE:
-                        newLog.type = "OUTGOING";
-                        break;
-                    case CallLog.Calls.INCOMING_TYPE:
-                        newLog.type = "INCOMING";
-                        break;
 
-                    case CallLog.Calls.MISSED_TYPE:
-                        newLog.type = "MISSED";
-                        break;
-                    default:
-                        newLog.type = "MISSED";
+        Thread insertOp = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.setMessage("Saving Data....");
+                        mProgressDialog.setIndeterminate(true);
+                        mProgressDialog.show();
+                    }
+                });
+                logsList.clear();
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
+                    Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI,
+                            null, null, null, CallLog.Calls.DATE + " DESC");
+                    int number = cursor.getColumnIndex(CallLog.Calls.NUMBER);
+                    int type = cursor.getColumnIndex(CallLog.Calls.TYPE);
+                    int date = cursor.getColumnIndex(CallLog.Calls.DATE);
+                    int duration = cursor.getColumnIndex(CallLog.Calls.DURATION);
+                    while (cursor.moveToNext()) {
+                        CallLogData newLog = new CallLogData();
+                        newLog.number = cursor.getString(number);
+                        String callType = cursor.getString(type);
+                        String callDate = cursor.getString(date);
+                        Date callDayTime = new Date(Long.valueOf(callDate));
+                        newLog.timeStamp = callDayTime.toString();
+                        newLog.duration = cursor.getString(duration);
+                        String dir = null;
+                        int dircode = Integer.parseInt(callType);
+                        switch (dircode) {
+                            case CallLog.Calls.OUTGOING_TYPE:
+                                newLog.type = "OUTGOING";
+                                break;
+                            case CallLog.Calls.INCOMING_TYPE:
+                                newLog.type = "INCOMING";
+                                break;
+
+                            case CallLog.Calls.MISSED_TYPE:
+                                newLog.type = "MISSED";
+                                break;
+                            default:
+                                newLog.type = "MISSED";
+                        }
+                        Log.d("Phone", newLog.toString());
+                        logsList.add(newLog);
+                        putLogtoDatabase(newLog, getApplicationContext());
+                    }
+                    cursor.close();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mProgressDialog.cancel();
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
                 }
-                Log.d("Phone", newLog.toString());
-                logsList.add(newLog);
             }
-            cursor.close();
-            adapter.notifyDataSetChanged();
-        }
+        });
+        insertOp.start();
+        adapter.notifyDataSetChanged();
+
+
     }
+
 
     private class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
 
-        //SongInfo is the model name class
+
         private ArrayList<CallLogData> usersList;
         private android.content.Context mContext;
 
-        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
             private TextView PhoneNumber, Duration, Type, TimeStamp;
 
@@ -112,12 +143,12 @@ public class PhoneActivity extends AppCompatActivity {
             }
         }
 
-        public UsersAdapter(android.content.Context context, ArrayList<CallLogData> usersList){
+        public UsersAdapter(android.content.Context context, ArrayList<CallLogData> usersList) {
             mContext = context;
             UsersAdapter.this.usersList = usersList;
         }
 
-        private android.content.Context getmContext(){
+        private android.content.Context getmContext() {
             return mContext;
         }
 
@@ -125,7 +156,7 @@ public class PhoneActivity extends AppCompatActivity {
         public UsersAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
             //R.layout.sms_thread is the layout xml dealing with how the elements of a single item in RecyclerView should appear
-            View view = getLayoutInflater().inflate(R.layout.call_log_item,parent,false);
+            View view = getLayoutInflater().inflate(R.layout.call_log_item, parent, false);
             ViewHolder viewHolder = new ViewHolder(view);
 
             return viewHolder;
@@ -140,13 +171,13 @@ public class PhoneActivity extends AppCompatActivity {
 
             TextView duration = holder.Duration;
             int sec = Integer.parseInt(details.getDuration());
-            int min = sec/60;
-            int s = sec%60;
+            int min = sec / 60;
+            int s = sec % 60;
             String res;
-            if(min == 0)
-                res = ""+s+"s";
+            if (min == 0)
+                res = "" + s + "s";
             else
-                res = ""+min+"min "+s+"s";
+                res = "" + min + "min " + s + "s";
             duration.setText(res);
 
             TextView type = holder.Type;
@@ -162,5 +193,27 @@ public class PhoneActivity extends AppCompatActivity {
         public int getItemCount() {
             return UsersAdapter.this.usersList.size();
         }
+    }
+
+
+    private void putLogtoDatabase(CallLogData callLogData, Context context) {
+        PhoneHelperMethod helper = new PhoneHelperMethod(context);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(PhoneContract.PhoneEntry.COLUMN_SENDER_ADDRESS, callLogData.getNumber());
+        values.put(PhoneContract.PhoneEntry.COLUMN_MSG_DURATION, callLogData.getDuration());
+        values.put(PhoneContract.PhoneEntry.COLUMN_MSG_DATE, callLogData.getTimeStamp());
+        values.put(PhoneContract.PhoneEntry.COLUMN_MSG_TYPE, callLogData.getType());
+
+
+        long id = db.insertWithOnConflict(PhoneContract.PhoneEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+        if (id == -1) {
+            Toast.makeText(context, "Data not saved\nPlease Try again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        db.close();
     }
 }

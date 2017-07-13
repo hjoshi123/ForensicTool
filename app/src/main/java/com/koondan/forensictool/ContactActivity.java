@@ -41,14 +41,14 @@ public class ContactActivity extends AppCompatActivity {
         setContentView(R.layout.activity_contact);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_contacts);
         adapter = new UsersAdapter(this, contacts);
-
+        checkUserPermissions();
         getSupportActionBar().setTitle("Contacts");
-
+        mProgressDialog = new ProgressDialog(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
-        mProgressDialog = new ProgressDialog(this);
-        checkUserPermissions();
+
+
         adapter.notifyDataSetChanged();
 
     }

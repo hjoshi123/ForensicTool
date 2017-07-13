@@ -6,15 +6,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class FirstActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
-    private FloatingActionButton smsButton, callLogsButton, contactButton, deviceButton, infoButton;
+    private ImageButton smsButton, callLogsButton, contactButton, deviceButton, infoButton;
     int PERMISSION_ALL = 1;
     String[] PERMISSIONS = {Manifest.permission.READ_SMS, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALL_LOG};
 
@@ -23,11 +23,11 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
 
-        smsButton = (FloatingActionButton) findViewById(R.id.sms_button);
-        callLogsButton = (FloatingActionButton) findViewById(R.id.call_logs_button);
-        deviceButton = (FloatingActionButton) findViewById(R.id.device_info_button);
-        contactButton = (FloatingActionButton) findViewById(R.id.contacts_button);
-        infoButton = (FloatingActionButton) findViewById(R.id.info_button);
+        smsButton = (ImageButton) findViewById(R.id.sms_button);
+        callLogsButton = (ImageButton) findViewById(R.id.call_logs_button);
+        deviceButton = (ImageButton) findViewById(R.id.device_info_button);
+        contactButton = (ImageButton) findViewById(R.id.contacts_button);
+        infoButton = (ImageButton) findViewById(R.id.info_button);
 
         smsButton.setOnClickListener(this);
         callLogsButton.setOnClickListener(this);

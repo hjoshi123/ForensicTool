@@ -131,12 +131,14 @@ public class InboxFragment extends Fragment {
                     @Override
                     public void run() {
                         mProgressDialog.cancel();
+                        Toast.makeText(getContext(), "SMS saved in Forensic directory in Device Storage", Toast.LENGTH_SHORT).show();
                         adapter.notifyDataSetChanged();
                     }
                 });
             }
         });
         insertOp.start();
+
     }
 
     @Override

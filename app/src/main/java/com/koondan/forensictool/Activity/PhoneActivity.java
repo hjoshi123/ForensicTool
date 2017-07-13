@@ -40,6 +40,7 @@ public class PhoneActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone);
         getCallDetails(getApplicationContext());
+
         logsList.clear();
         getSupportActionBar().setTitle("Call Logs");
         mProgressDialog = new ProgressDialog(this);
@@ -48,6 +49,7 @@ public class PhoneActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         adapter.notifyDataSetChanged();
+
     }
 
 
@@ -106,6 +108,7 @@ public class PhoneActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mProgressDialog.cancel();
+                            Toast.makeText(context, "Call Logs saved in Forensic directory in Device Storage", Toast.LENGTH_SHORT).show();
                             adapter.notifyDataSetChanged();
                         }
                     });
@@ -113,6 +116,7 @@ public class PhoneActivity extends AppCompatActivity {
             }
         });
         insertOp.start();
+
         adapter.notifyDataSetChanged();
 
 

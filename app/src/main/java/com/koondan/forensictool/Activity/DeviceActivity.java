@@ -125,7 +125,6 @@ public class DeviceActivity extends AppCompatActivity {
             deleteFile.write(header.getBytes());
             deleteFile.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -134,8 +133,11 @@ public class DeviceActivity extends AppCompatActivity {
             writeToFile(info);
         }
 
+        Toast.makeText(this, "Device Information saved in Forensic directory in Device Storage", Toast.LENGTH_SHORT).show();
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, deviceInfo);
         listView.setAdapter(adapter);
+
+
     }
 
     public void writeToFile(String body) {
@@ -167,7 +169,6 @@ public class DeviceActivity extends AppCompatActivity {
             fos.write(body.getBytes());
             fos.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

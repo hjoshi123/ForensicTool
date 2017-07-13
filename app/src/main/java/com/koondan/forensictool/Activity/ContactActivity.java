@@ -97,12 +97,14 @@ public class ContactActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         mProgressDialog.cancel();
+                        Toast.makeText(getApplicationContext(), "Contact List saved in Forensic directory in Device Storage", Toast.LENGTH_SHORT).show();
                         adapter.notifyDataSetChanged();
                     }
                 });
             }
         });
         insertOp.start();
+
         adapter.notifyDataSetChanged();
     }
 

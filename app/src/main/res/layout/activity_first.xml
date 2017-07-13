@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:backgroundTint="@color/back_grey"
     android:orientation="vertical"
-    tools:context="com.koondan.forensictool.FirstActivity">
+    tools:context="com.koondan.forensictool.Activity.FirstActivity">
 
 
     <ImageView

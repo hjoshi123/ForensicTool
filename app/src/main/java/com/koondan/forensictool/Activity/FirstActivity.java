@@ -1,4 +1,4 @@
-package com.koondan.forensictool;
+package com.koondan.forensictool.Activity;
 
 import android.Manifest;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import com.koondan.forensictool.R;
 
 public class FirstActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;

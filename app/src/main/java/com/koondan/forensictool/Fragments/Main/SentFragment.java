@@ -1,15 +1,19 @@
-package com.koondan.forensictool;
+package com.koondan.forensictool.Fragments.Main;
 
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,17 +25,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.koondan.forensictool.Activity.ViewMessageActivity;
+import com.koondan.forensictool.Data.SMSData;
+import com.koondan.forensictool.DividerItemDecoration;
+import com.koondan.forensictool.R;
 import com.koondan.forensictool.Storage.SMSContract.SMSEntry;
-import com.koondan.forensictool.Storage.SMSHelperMethodInbox;
+import com.koondan.forensictool.Storage.SMSHelperMethodSent;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InboxFragment extends Fragment {
+public class SentFragment extends Fragment {
 
     private ArrayList<SMSData> smsList = new ArrayList<>();
     private ArrayList<SMSData> threadList = new ArrayList<>();
@@ -40,10 +49,9 @@ public class InboxFragment extends Fragment {
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private RecyclerView recyclerView;
     private UsersAdapter adapter = new UsersAdapter(getActivity(),threadList);
-    private View view;
     private ProgressDialog mProgressDialog;
 
-    public InboxFragment() {
+    public SentFragment() {
         // Required empty public constructor
     }
 
@@ -52,19 +60,17 @@ public class InboxFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_inbox, container, false);
 
-        if(view == null){
-            view = inflater.inflate(R.layout.fragment_inbox, container, false);
-            recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_inbox);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_inbox);
 
-            recyclerView.setAdapter(adapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-            recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext()));
-            mProgressDialog = new ProgressDialog(getActivity());
-        }
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext()));
+        mProgressDialog = new ProgressDialog(getActivity());
+        checkUserPermissions();
         getSMSData();
         return view;
-
     }
 
     private void getSMSData() {
@@ -82,7 +88,7 @@ public class InboxFragment extends Fragment {
 
                 smsList.clear();
                 ContentResolver contentResolver = getActivity().getContentResolver();
-                Uri uri = Uri.parse("content://sms/inbox");
+                Uri uri = Uri.parse("content://sms/sent");
                 cursor = contentResolver.query(uri, null, null, null, null);
                 String[] columns = new String[]{"address", "person", "date", "body", "type", "thread_id"};
                 getActivity().startManagingCursor(cursor);
@@ -104,7 +110,7 @@ public class InboxFragment extends Fragment {
                         String smsDate = finaldate.toString();
                         sms.setTimeStamp(smsDate);
                         Log.d("SMS", smsDate);
-                        InboxFragment.this.smsList.add(sms);
+                        SentFragment.this.smsList.add(sms);
                         putSMStoDatabase(sms,getContext());
 
                         cursor.moveToNext();
@@ -138,6 +144,7 @@ public class InboxFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        checkUserPermissions();
         adapter.notifyDataSetChanged();
     }
 
@@ -224,8 +231,42 @@ public class InboxFragment extends Fragment {
         }
     }
 
+    private void checkUserPermissions(){
+        if ( Build.VERSION.SDK_INT >= 23){
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_SMS) !=
+                    PackageManager.PERMISSION_GRANTED  ){
+                requestPermissions(new String[]{
+                                Manifest.permission.READ_SMS},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+                return ;
+            }
+        }
+
+        //if SDK is lesser than 23 then execute some function
+        //getSMSData();
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // if permission is granted then execute the same function as above
+                    //getSMSData();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(getActivity(),"Media Permissions necessary" , Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
     private void putSMStoDatabase(SMSData sms, Context context){
-        SMSHelperMethodInbox helper = new SMSHelperMethodInbox(context);
+        SMSHelperMethodSent helper = new SMSHelperMethodSent(context);
         SQLiteDatabase db = helper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -243,5 +284,6 @@ public class InboxFragment extends Fragment {
         }
         db.close();
     }
+
 
 }

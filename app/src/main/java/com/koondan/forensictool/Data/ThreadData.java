@@ -1,4 +1,4 @@
-package com.koondan.forensictool;
+package com.koondan.forensictool.Data;
 
 /**
  * Created by Koondan on 06/07/17.

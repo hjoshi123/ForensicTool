@@ -1,7 +1,9 @@
-package com.koondan.forensictool;
+package com.koondan.forensictool.Activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.koondan.forensictool.R;
 
 public class InfoActivity extends AppCompatActivity {
 

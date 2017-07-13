@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context="com.koondan.forensictool.ViewSentMessagesActivity">
+    tools:context="com.koondan.forensictool.Activity.ViewSentMessagesActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/sentmsg_recyclerview"

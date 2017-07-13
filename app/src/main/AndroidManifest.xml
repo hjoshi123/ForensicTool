@@ -16,21 +16,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".Activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ViewMessageActivity" />
-        <activity android:name=".ViewSentMessagesActivity" />
-        <activity android:name=".FirstActivity">
+        <activity android:name=".Activity.ViewMessageActivity" />
+        <activity android:name=".Activity.ViewSentMessagesActivity" />
+        <activity android:name=".Activity.FirstActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DeviceActivity" />
-        <activity android:name=".PhoneActivity" />
-        <activity android:name=".ContactActivity" />
-        <activity android:name=".InfoActivity"></activity>
+        <activity android:name=".Activity.DeviceActivity" />
+        <activity android:name=".Activity.PhoneActivity" />
+        <activity android:name=".Activity.ContactActivity" />
+        <activity android:name=".Activity.InfoActivity"></activity>
     </application>
 
 </manifest>

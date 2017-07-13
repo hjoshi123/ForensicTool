@@ -1,4 +1,4 @@
-package com.koondan.forensictool;
+package com.koondan.forensictool.Activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -19,6 +19,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.koondan.forensictool.Data.CallLogData;
+import com.koondan.forensictool.DividerItemDecoration;
+import com.koondan.forensictool.R;
 import com.koondan.forensictool.Storage.PhoneContract;
 import com.koondan.forensictool.Storage.PhoneHelperMethod;
 

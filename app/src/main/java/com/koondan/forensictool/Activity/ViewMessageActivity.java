@@ -1,4 +1,4 @@
-package com.koondan.forensictool;
+package com.koondan.forensictool.Activity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.koondan.forensictool.Data.SMSData;
+import com.koondan.forensictool.R;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

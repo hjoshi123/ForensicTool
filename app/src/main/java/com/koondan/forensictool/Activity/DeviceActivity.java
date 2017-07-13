@@ -1,4 +1,4 @@
-package com.koondan.forensictool;
+package com.koondan.forensictool.Activity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -11,6 +11,8 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.koondan.forensictool.R;
 
 import java.io.File;
 import java.io.FileOutputStream;

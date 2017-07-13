@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+
     android:weightSum="8"
     android:padding="12dp">
 
+    <ImageView
+        android:layout_width="48sp"
+        android:layout_height="48sp"
+        android:src="@drawable/contact"/>
+
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
+        android:gravity="center"
         android:text="Senders's Name"
         android:textAlignment="center"
         android:textSize="20sp"

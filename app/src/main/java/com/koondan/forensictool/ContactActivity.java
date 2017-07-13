@@ -1,9 +1,13 @@
 package com.koondan.forensictool;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -11,10 +15,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.koondan.forensictool.Storage.ContactContract;
+import com.koondan.forensictool.Storage.ContactHelperMethod;
 
 import java.util.ArrayList;
 
@@ -23,6 +31,7 @@ public class ContactActivity extends AppCompatActivity {
     private ArrayList<ContactData> contacts = new ArrayList<>();
     private ArrayList<String> numbers = new ArrayList<>();
     private RecyclerView recyclerView;
+    private ProgressDialog mProgressDialog;
     private UsersAdapter adapter;
     private Cursor cur;
 
@@ -38,57 +47,78 @@ public class ContactActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
-
+        mProgressDialog = new ProgressDialog(this);
         checkUserPermissions();
         adapter.notifyDataSetChanged();
 
     }
 
-    private void getContacts(){
-        contacts.clear();
-        numbers.clear();
-        ContentResolver cr = getContentResolver();
-        cur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME+" ASC");
+    private void getContacts() {
+        Log.d("Called", "contacts");
+        Thread insertOp = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.setMessage("Saving Data....");
+                        mProgressDialog.setIndeterminate(true);
+                        mProgressDialog.show();
+                    }
+                });
+                contacts.clear();
+                numbers.clear();
+                ContentResolver cr = getContentResolver();
+                cur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
 
-        if(cur.getCount() > 0){
-            while(cur.moveToNext()){
-                ContactData data = new ContactData();
-                data.userName = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                String phone = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                phone = phone.replaceAll("\\s+","");
-                data.phoneNumber = phone;
-                if(numbers.contains(phone))
-                {
-                    //Do nothing
-                }
-                else
-                {
-                    contacts.add(data);
-                    numbers.add(phone);
+                if (cur.getCount() > 0) {
+                    while (cur.moveToNext()) {
+                        ContactData data = new ContactData();
+                        data.userName = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                        String phone = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        phone = phone.replaceAll("\\s+", "");
+                        data.phoneNumber = phone;
+                        if (numbers.contains(phone)) {
+                            //Do nothing
+                        } else {
+                            contacts.add(data);
+                            numbers.add(phone);
+                            putContacttoDatabase(data, getApplicationContext());
+                        }
+
+                    }
                 }
 
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.cancel();
+                        adapter.notifyDataSetChanged();
+                    }
+                });
             }
-        }
+        });
+        insertOp.start();
         adapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(cur != null){
+        if (cur != null) {
             cur.close();
         }
     }
 
-    private void checkUserPermissions(){
-        if ( Build.VERSION.SDK_INT >= 23){
+    private void checkUserPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) !=
-                    PackageManager.PERMISSION_GRANTED  ){
+                    PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
                                 Manifest.permission.READ_CONTACTS},
                         REQUEST_CODE_ASK_PERMISSIONS);
-                return ;
+                return;
             }
         }
 
@@ -105,7 +135,7 @@ public class ContactActivity extends AppCompatActivity {
                     getContacts();
                 } else {
                     // Permission Denied
-                    Toast.makeText(this,"Media Permissions necessary" , Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "Media Permissions necessary", Toast.LENGTH_SHORT)
                             .show();
                 }
                 break;
@@ -119,9 +149,9 @@ public class ContactActivity extends AppCompatActivity {
         private ArrayList<ContactData> usersList;
         private android.content.Context mContext;
 
-        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-            public TextView phoneNumberTextView,userNameTextView;
+            public TextView phoneNumberTextView, userNameTextView;
 
 
             public ViewHolder(View itemView) {
@@ -138,12 +168,12 @@ public class ContactActivity extends AppCompatActivity {
             }
         }
 
-        public UsersAdapter(android.content.Context context, ArrayList<ContactData> usersList){
+        public UsersAdapter(android.content.Context context, ArrayList<ContactData> usersList) {
             mContext = context;
             UsersAdapter.this.usersList = usersList;
         }
 
-        private android.content.Context getmContext(){
+        private android.content.Context getmContext() {
             return mContext;
         }
 
@@ -151,7 +181,7 @@ public class ContactActivity extends AppCompatActivity {
         public UsersAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
             //R.layout.sms_thread is the layout xml dealing with how the elements of a single item in RecyclerView should appear
-            View view = getLayoutInflater().inflate(R.layout.contacts_item,parent,false);
+            View view = getLayoutInflater().inflate(R.layout.contacts_item, parent, false);
             ViewHolder viewHolder = new ViewHolder(view);
 
             return viewHolder;
@@ -173,5 +203,24 @@ public class ContactActivity extends AppCompatActivity {
         public int getItemCount() {
             return UsersAdapter.this.usersList.size();
         }
+    }
+
+
+    private void putContacttoDatabase(ContactData contact, Context context) {
+        ContactHelperMethod helper = new ContactHelperMethod(context);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(ContactContract.ContactEntry.COLUMN_SENDER_ADDRESS, contact.getPhoneNumber());
+        values.put(ContactContract.ContactEntry.COLUMN_CONTACT_NAME, contact.getUserName());
+
+        long id = db.insertWithOnConflict(ContactContract.ContactEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+        if (id == -1) {
+            Toast.makeText(context, "Data not saved\nPlease Try again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        db.close();
     }
 }
